@@ -1,0 +1,26 @@
+.grid-style {
+  padding: 1em;
+  height: 100%;
+  width: 100%;
+  display: grid;
+  column-gap: 1em;
+  row-gap: 1em;
+}
+.grid-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.grid {
+  @extend .grid-style;
+  border-radius: 5px;
+  background: #bbada0;
+}
+
+.background-grid {
+  @extend .grid-style;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
