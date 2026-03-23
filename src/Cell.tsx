@@ -1,7 +1,8 @@
-function Cell({ coordinate }: { coordinate: { x: number, y: number }}) {
+import { type RefObject } from 'react';
+
+function Cell({ id, ref }: { id: string, ref: RefObject<HTMLDivElement> }) {
   return (
-    <div className="cell" key={`${coordinate.x}-${coordinate.y}`}>
-    </div>
+    <div id={id} className="cell" ref={ref}></div>
   )
 }
 

@@ -2,12 +2,12 @@ function Cube(
   {
     value,
     style,
-  }: { value: number, style: { gridColumn: string, gridRow: string } }
+  }: { value: number, style: { transform: string } }
 ) {
 
   return (
     <div className="cube" style={style}>
-      {value}<br />
+      {value}
     </div>
   )
 }
