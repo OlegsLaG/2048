@@ -3,15 +3,15 @@ import { EventList } from './EventList.ts';
 
 export class EventStates {
   constructor(private bus: EventBus) {
-    bus.on(EventList.MOVE_UP, (coordinates: { x?: number | string, y?: number | string }, callback: () => void) => this.move(EventList.MOVE_UP, coordinates, callback));
-    bus.on(EventList.MOVE_RIGHT, (coordinates: { x?: number | string, y?: number | string }, callback: () => void) => this.move(EventList.MOVE_RIGHT, coordinates, callback));
-    bus.on(EventList.MOVE_DOWN, (coordinates: { x?: number | string, y?: number | string }, callback: () => void) => this.move(EventList.MOVE_DOWN, coordinates, callback));
-    bus.on(EventList.MOVE_LEFT, (coordinates: { x?: number | string, y?: number | string }, callback: () => void) => this.move(EventList.MOVE_LEFT, coordinates, callback));
+    bus.on(EventList.MOVE_UP, (callback: () => void) => this.move(EventList.MOVE_UP, callback));
+    bus.on(EventList.MOVE_RIGHT, (callback: () => void) => this.move(EventList.MOVE_RIGHT, callback));
+    bus.on(EventList.MOVE_DOWN, (callback: () => void) => this.move(EventList.MOVE_DOWN, callback));
+    bus.on(EventList.MOVE_LEFT, (callback: () => void) => this.move(EventList.MOVE_LEFT, callback));
   }
 
-  move(direction: string, coordinates: { x?: number | string, y?: number | string }, callback: (coordinates: { x?: number | string, y?: number | string }) => void) {
-    console.warn(`Move ${direction} to `, coordinates);
+  move(direction: string, callback: () => void) {
+    console.warn(`Moved ${direction}`);
 
-    callback(coordinates);
+    callback();
   }
 }

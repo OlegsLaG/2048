@@ -1,6 +1,6 @@
 import Cell from './Cell.tsx';
 import ActiveCell from './ActiveCell.tsx';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { EventBus } from './engine/EventBus.ts';
 import { EventList } from './engine/EventList.ts';
 import { EventStates } from './engine/EventStates.ts';
@@ -13,9 +13,23 @@ new EventStates(bus);
 function Grid({ size }: { size: number }) {
   const hasRun = useRef(false);
   const cellRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const activeCellRef = useRef<ActiveCell[]>([]);
   const [activeCell, setActiveCell] = useState<ActiveCell[]>([]);
+  const gridContainer = useRef({ x: 0, y: 0 });
 
-  const grid: Grid[] = [];
+  const grid = useMemo(() => {
+    const arr: Grid[] = [];
+    for (let i = 0; i < size; i++) {
+      for (let j = 0; j < size; j++) {
+        arr.push({
+          coordinate: { x: i, y: j },
+          occupied: false,
+        });
+      }
+    }
+    return arr;
+  }, [size]);
+
   const gridStyles = {
     gridTemplateColumns: `repeat(${size}, minmax(0, ${500/size-15}px))`,
     gridTemplateRows: `repeat(${size}, minmax(0, ${500/size-15}px))`,
@@ -30,16 +44,42 @@ function Grid({ size }: { size: number }) {
     return { x, y };
   };
 
-  const startingCells = Math.round(size / 2);
+  const createNewActiveCell = (): ActiveCell => {
+    let coords = randomCoordinate();
 
-  for (let i = 0; i < size; i++) {
-    for (let j = 0; j < size; j++) {
-      grid.push({
-        coordinate: { x: i, y: j },
-        occupied: false,
-      });
+    grid.find(cell => {
+      if (cell.coordinate.x === coords.x && cell.coordinate.y === coords.y) {
+        if (!cell.occupied) {
+          cell.occupied = true;
+          return;
+        }
+        console.warn('Cell already occupied');
+        coords = randomCoordinate();
+        return coords;
+      }
+    });
+
+    const activeKey = `${coords.x}-${coords.y}`;
+    const initialPosition = cellRefs.current[activeKey]?.getBoundingClientRect() || { x: 0, y: 0 };
+
+    console.warn('initialPosition', initialPosition);
+    console.warn('gridContainer', gridContainer);
+
+    const relativePosition = {
+      x: (initialPosition?.x - gridContainer?.current.x) - 15,
+      y: (initialPosition?.y - gridContainer?.current.y) - 15,
+    }
+
+    return {
+      coordinate: { x: coords.x, y: coords.y },
+      value: 2,
+      style: {
+        transform: `translate(${relativePosition?.x}px, ${relativePosition?.y}px)`,
+      },
     }
   }
+
+  const startingCells = Math.round(size / 2);
 
   useLayoutEffect(() => {
     if (hasRun.current) {
@@ -48,53 +88,32 @@ function Grid({ size }: { size: number }) {
 
     hasRun.current = true;
 
-    const newGrid: ActiveCell[] = [];
-    const gridContainer = document.getElementById('grid-container')?.getBoundingClientRect() || { x: 0, y: 0 };
-
-    const createNewActiveCell = (): void => {
-      let coords = randomCoordinate();
-
-      grid.find(cell => {
-        if (cell.coordinate.x === coords.x && cell.coordinate.y === coords.y) {
-          if (!cell.occupied) {
-            cell.occupied = true;
-            return;
-          }
-          coords = randomCoordinate();
-          return coords;
-        }
-      });
-
-      const activeKey = `${coords.x}-${coords.y}`;
-      const initialPosition = cellRefs.current[activeKey]?.getBoundingClientRect() || { x: 0, y: 0 };
-
-      const relativePosition = {
-        x: (initialPosition?.x - gridContainer?.x) - 15,
-        y: (initialPosition?.y - gridContainer?.y) - 15,
-      }
-
-      newGrid.push({
-        coordinate: { x: coords.x, y: coords.y },
-        value: 2,
-        style: {
-          transform: `translate(${relativePosition?.x}px, ${relativePosition?.y}px)`,
-        },
-      });
-    }
+    gridContainer.current = document.getElementById('grid-container')?.getBoundingClientRect() || { x: 0, y: 0 };
 
     for (let i = 0; i < startingCells; i++) {
-      createNewActiveCell();
+      setActiveCell(prev => [...prev, createNewActiveCell()]);
     }
 
-    setActiveCell(newGrid);
+  }, [activeCell, createNewActiveCell, grid, randomCoordinate, size, startingCells]);
 
-    addEventListener('keydown', (event) => {
+  useEffect(() => {
+    activeCellRef.current = activeCell;
+
+    const handler = (event: KeyboardEvent) => {
       if (event.key === 'ArrowUp') {
-        bus.emit(EventList.MOVE_UP, { x: 0 });
+        setActiveCell(prev => {
+          return [...prev, createNewActiveCell()];
+        });
       }
-    })
+    };
 
-  }, [grid, randomCoordinate, size, startingCells]);
+    window.addEventListener('keydown', handler);
+
+    return () => {
+      window.removeEventListener('keydown', handler);
+    };
+
+  }, [activeCell, createNewActiveCell]);
 
 
   return (
