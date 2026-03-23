@@ -1,5 +1,5 @@
 import Cell from './Cell.tsx';
-import Cube from './Cube.tsx';
+import ActiveCell from './ActiveCell.tsx';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { EventBus } from './engine/EventBus.ts';
 import { EventList } from './engine/EventList.ts';
@@ -30,7 +30,7 @@ function Grid({ size }: { size: number }) {
     return { x, y };
   };
 
-  const startingCubes = Math.round(size / 2);
+  const startingCells = Math.round(size / 2);
 
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
@@ -82,7 +82,7 @@ function Grid({ size }: { size: number }) {
       });
     }
 
-    for (let i = 0; i < startingCubes; i++) {
+    for (let i = 0; i < startingCells; i++) {
       createNewActiveCell();
     }
 
@@ -94,7 +94,7 @@ function Grid({ size }: { size: number }) {
       }
     })
 
-  }, [grid, randomCoordinate, size, startingCubes]);
+  }, [grid, randomCoordinate, size, startingCells]);
 
 
   return (
@@ -104,7 +104,7 @@ function Grid({ size }: { size: number }) {
         style={gridStyles}
       >
         {activeCell?.map((cell) => (
-          <Cube
+          <ActiveCell
             style={cell?.style}
             key={`${cell?.coordinate.x}-${cell?.coordinate.y}`}
             value={cell.value}

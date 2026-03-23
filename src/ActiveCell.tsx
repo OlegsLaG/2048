@@ -1,4 +1,4 @@
-function Cube(
+function ActiveCell(
   {
     value,
     style,
@@ -6,10 +6,10 @@ function Cube(
 ) {
 
   return (
-    <div className="cube" style={style}>
+    <div className="active-cell" style={style}>
       {value}
     </div>
   )
 }
 
-export default Cube;
+export default ActiveCell;
