@@ -156,7 +156,9 @@ function Grid({ size }: { size: number }) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveCell(prev => {
         const newCell = createNewActiveCell();
-        if (!newCell) return prev;
+        if (!newCell) {
+          return prev;
+        }
 
         return [...prev, newCell];
       });
@@ -174,7 +176,9 @@ function Grid({ size }: { size: number }) {
           setNewPosition();
           setActiveCell(prev => {
             const newCell = createNewActiveCell();
-            if (!newCell) return prev;
+            if (!newCell) {
+              return prev;
+            }
 
             return [...prev, newCell];
           });
@@ -188,7 +192,7 @@ function Grid({ size }: { size: number }) {
       window.removeEventListener('keydown', handler);
     };
 
-  }, [activeCell, createNewActiveCell]);
+  }, [activeCell, createNewActiveCell, setNewPosition]);
 
   return (
     <div id="grid-container" className="grid-container">
