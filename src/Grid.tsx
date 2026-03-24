@@ -6,7 +6,27 @@ import { EventList } from './engine/EventList.ts';
 import { EventStates } from './engine/EventStates.ts';
 
 export interface Grid { coordinate: { x: number, y: number }, occupied: boolean }
-export interface ActiveCell { coordinate: { x: number, y: number }, value: number, style: { transform: string } }
+
+export interface ActiveCell {
+  coordinate: {
+    x: number,
+    y: number,
+  },
+  value: number,
+  style: {
+    transform: string,
+    width: string,
+    height: string,
+  },
+}
+
+const Direction = {
+  ArrowUp: 'MOVE_UP',
+  ArrowRight: 'MOVE_RIGHT',
+  ArrowDown: 'MOVE_DOWN',
+  ArrowLeft: 'MOVE_LEFT',
+} as const;
+
 const bus = new EventBus();
 new EventStates(bus);
 
@@ -44,39 +64,81 @@ function Grid({ size }: { size: number }) {
     return { x, y };
   };
 
-  const createNewActiveCell = (): ActiveCell => {
-    let coords = randomCoordinate();
+  const createNewActiveCell = (): ActiveCell | null => {
+    const occupiedSet = new Set(
+      activeCellRef.current.map(c => `${c.coordinate.x}-${c.coordinate.y}`)
+    );
 
-    grid.find(cell => {
-      if (cell.coordinate.x === coords.x && cell.coordinate.y === coords.y) {
-        if (!cell.occupied) {
-          cell.occupied = true;
-          return;
-        }
-        console.warn('Cell already occupied');
-        coords = randomCoordinate();
-        return coords;
-      }
+    const freeCells = grid.filter(cell => {
+      const key = `${cell.coordinate.x}-${cell.coordinate.y}`;
+      return !occupiedSet.has(key);
     });
 
-    const activeKey = `${coords.x}-${coords.y}`;
-    const initialPosition = cellRefs.current[activeKey]?.getBoundingClientRect() || { x: 0, y: 0 };
+    if (freeCells.length === 0) {
+      bus.emit(EventList.GAME_OVER, null);
+      return null;
+    }
 
-    console.warn('initialPosition', initialPosition);
-    console.warn('gridContainer', gridContainer);
+    const randomCell = freeCells[Math.floor(Math.random() * freeCells.length)];
+    const { x, y } = randomCell.coordinate;
+
+    const activeKey = `${x}-${y}`;
+    const cellRect = cellRefs.current[activeKey]?.getBoundingClientRect();
+
+    if (!cellRect) {
+      return null;
+    }
 
     const relativePosition = {
-      x: (initialPosition?.x - gridContainer?.current.x) - 15,
-      y: (initialPosition?.y - gridContainer?.current.y) - 15,
-    }
+      x: cellRect.x - gridContainer.current.x,
+      y: cellRect.y - gridContainer.current.y,
+    };
 
     return {
-      coordinate: { x: coords.x, y: coords.y },
+      coordinate: { x, y },
       value: 2,
       style: {
-        transform: `translate(${relativePosition?.x}px, ${relativePosition?.y}px)`,
+        transform: `translate(${relativePosition.x}px, ${relativePosition.y}px)`,
+        width: `${cellRect.width}px`,
+        height: `${cellRect.height}px`,
       },
-    }
+    };
+  }
+
+  const setNewPosition = () => {
+    activeCellRef.current.forEach(cell => {
+      let x: number | null = null;
+      let y: number | null = null;
+      const cellRect = cellRefs.current[`${cell.coordinate.x}-${cell.coordinate.y}`]?.getBoundingClientRect();
+
+      if (!cellRect) {
+        return null;
+      }
+
+      const relativePosition = {
+        x: cellRect.x - gridContainer.current.x,
+        y: cellRect.y - gridContainer.current.y,
+      };
+
+      bus.on(EventList.MOVE_UP, () => {
+        console.warn('setNewPostion: Move up');
+        x = 0;
+
+        Object.assign({}, cell.style, { transform: `translate(${x}px)`});
+
+      });
+      bus.on(EventList.MOVE_RIGHT, () => {
+        y = size - 1;
+      });
+      bus.on(EventList.MOVE_DOWN, () => {
+        x = size - 1;
+      })
+      bus.on(EventList.MOVE_LEFT, () => {
+        Object.assign({}, cell.style, { transform: `translate(${relativePosition.x}px ${y}px)`});
+      })
+
+      console.warn('cell.style', cell.style);
+    })
   }
 
   const startingCells = Math.round(size / 2);
@@ -91,7 +153,13 @@ function Grid({ size }: { size: number }) {
     gridContainer.current = document.getElementById('grid-container')?.getBoundingClientRect() || { x: 0, y: 0 };
 
     for (let i = 0; i < startingCells; i++) {
-      setActiveCell(prev => [...prev, createNewActiveCell()]);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveCell(prev => {
+        const newCell = createNewActiveCell();
+        if (!newCell) return prev;
+
+        return [...prev, newCell];
+      });
     }
 
   }, [activeCell, createNewActiveCell, grid, randomCoordinate, size, startingCells]);
@@ -100,9 +168,16 @@ function Grid({ size }: { size: number }) {
     activeCellRef.current = activeCell;
 
     const handler = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowUp') {
-        setActiveCell(prev => {
-          return [...prev, createNewActiveCell()];
+      const eventName = EventList[Direction[event.key as keyof typeof Direction]];
+      if (eventName) {
+        bus.emit(eventName, () => {
+          setNewPosition();
+          setActiveCell(prev => {
+            const newCell = createNewActiveCell();
+            if (!newCell) return prev;
+
+            return [...prev, newCell];
+          });
         });
       }
     };
@@ -115,11 +190,10 @@ function Grid({ size }: { size: number }) {
 
   }, [activeCell, createNewActiveCell]);
 
-
   return (
     <div id="grid-container" className="grid-container">
       <div
-        className="grid"
+        className="background-grid"
         style={gridStyles}
       >
         {activeCell?.map((cell) => (
@@ -129,12 +203,6 @@ function Grid({ size }: { size: number }) {
             value={cell.value}
           />
         ))}
-      </div>
-      <div
-        className="background-grid"
-        style={gridStyles}
-      >
-
         {grid.map((cell) => (
           <Cell
             id={`${cell.coordinate.x}-${cell.coordinate.y}`}

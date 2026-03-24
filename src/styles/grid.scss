@@ -6,19 +6,16 @@
   column-gap: 15px;
   row-gap: 15px;
 }
+
 .grid-container {
   position: relative;
   width: 100%;
   height: 100%;
 }
-.grid {
-  @extend .grid-style;
-  border-radius: 5px;
-}
 
 .background-grid {
   @extend .grid-style;
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
   z-index: 1;

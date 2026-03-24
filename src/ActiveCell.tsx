@@ -2,7 +2,7 @@ function ActiveCell(
   {
     value,
     style,
-  }: { value: number, style: { transform: string } }
+  }: { value: number, style: { transform: string, width: string, height: string } }
 ) {
 
   return (
