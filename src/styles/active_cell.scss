@@ -1,5 +1,7 @@
 .active-cell {
   position: absolute;
+  top: 0;
+  left: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8,4 +10,5 @@
   background: #eee4db;
   font-size: 40px;
   font-weight: bold;
+  transition: transform 0.2s ease-in-out;
 }

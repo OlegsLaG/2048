@@ -9,9 +9,7 @@ export class EventStates {
     bus.on(EventList.MOVE_LEFT, (callback: () => void) => this.move(EventList.MOVE_LEFT, callback));
   }
 
-  move(direction: string, callback: () => void) {
-    console.warn(`Moved ${direction}`);
-
+  move(_direction: string, callback: () => void) {
     callback();
   }
 }

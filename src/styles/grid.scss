@@ -3,6 +3,7 @@
   height: calc(100% - 30px);
   width: calc(100% - 30px);
   display: grid;
+  grid-auto-flow: column;
   column-gap: 15px;
   row-gap: 15px;
 }

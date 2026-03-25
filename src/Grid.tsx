@@ -51,8 +51,8 @@ function Grid({ size }: { size: number }) {
   }, [size]);
 
   const gridStyles = {
-    gridTemplateColumns: `repeat(${size}, minmax(0, ${500/size-15}px))`,
-    gridTemplateRows: `repeat(${size}, minmax(0, ${500/size-15}px))`,
+    gridTemplateColumns: `repeat(${size}, minmax(0, ${500/size}px))`,
+    gridTemplateRows: `repeat(${size}, minmax(0, ${500/size}px))`,
   }
 
   const randomCoordinate = () => {
@@ -105,40 +105,56 @@ function Grid({ size }: { size: number }) {
     };
   }
 
-  const setNewPosition = () => {
-    activeCellRef.current.forEach(cell => {
-      let x: number | null = null;
-      let y: number | null = null;
-      const cellRect = cellRefs.current[`${cell.coordinate.x}-${cell.coordinate.y}`]?.getBoundingClientRect();
+  const setNewPosition = (direction: keyof typeof Direction) => {
+    let x: number | undefined = undefined;
+    let y: number | undefined = undefined;
 
-      if (!cellRect) {
-        return null;
-      }
+    if (direction === 'ArrowUp') {
+      y = 0;
+    }
 
-      const relativePosition = {
-        x: cellRect.x - gridContainer.current.x,
-        y: cellRect.y - gridContainer.current.y,
-      };
+    if (direction === 'ArrowDown') {
+      y = size - 1;
+    }
 
-      bus.on(EventList.MOVE_UP, () => {
-        console.warn('setNewPostion: Move up');
-        x = 0;
+    if (direction === 'ArrowLeft') {
+      x = 0;
+    }
 
-        Object.assign({}, cell.style, { transform: `translate(${x}px)`});
+    if (direction === 'ArrowRight') {
+      x = size - 1;
+    }
 
+    setActiveCell(prev => {
+      const movedCells = prev.map((cell) => {
+        const cellRect = cellRefs.current[`${x !== undefined ? x : cell.coordinate.x}-${y !== undefined ? y : cell.coordinate.y}`]?.getBoundingClientRect();
+
+        if (!cellRect) {
+          return cell;
+        }
+
+        const relativePosition = {
+          x: cellRect.x - gridContainer.current.x,
+          y: cellRect.y - gridContainer.current.y,
+        };
+
+        const newStyle = {
+          ...cell.style,
+          transform: `translate(${relativePosition.x}px, ${relativePosition.y}px)`
+        };
+
+        return {
+          ...cell,
+          coordinate: {
+            x: x ? x : cell.coordinate.x,
+            y: y ? y : cell.coordinate.y,
+          },
+          style: newStyle,
+        };
       });
-      bus.on(EventList.MOVE_RIGHT, () => {
-        y = size - 1;
-      });
-      bus.on(EventList.MOVE_DOWN, () => {
-        x = size - 1;
-      })
-      bus.on(EventList.MOVE_LEFT, () => {
-        Object.assign({}, cell.style, { transform: `translate(${relativePosition.x}px ${y}px)`});
-      })
 
-      console.warn('cell.style', cell.style);
-    })
+      return [...movedCells];
+    });
   }
 
   const startingCells = Math.round(size / 2);
@@ -171,17 +187,19 @@ function Grid({ size }: { size: number }) {
 
     const handler = (event: KeyboardEvent) => {
       const eventName = EventList[Direction[event.key as keyof typeof Direction]];
+      const key = event.key as keyof typeof Direction;
+
       if (eventName) {
         bus.emit(eventName, () => {
-          setNewPosition();
-          setActiveCell(prev => {
-            const newCell = createNewActiveCell();
-            if (!newCell) {
-              return prev;
-            }
-
-            return [...prev, newCell];
-          });
+          setNewPosition(key);
+          // setActiveCell(prev => {
+          //   const newCell = createNewActiveCell();
+          //   if (!newCell) {
+          //     return prev;
+          //   }
+          //
+          //   return [...prev, newCell];
+          // });
         });
       }
     };
@@ -200,10 +218,10 @@ function Grid({ size }: { size: number }) {
         className="background-grid"
         style={gridStyles}
       >
-        {activeCell?.map((cell) => (
+        {activeCell?.map((cell, index) => (
           <ActiveCell
             style={cell?.style}
-            key={`${cell?.coordinate.x}-${cell?.coordinate.y}`}
+            key={index}
             value={cell.value}
           />
         ))}

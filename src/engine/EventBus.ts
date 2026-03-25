@@ -10,7 +10,6 @@ export class EventBus<Events extends Record<string, unknown>> {
     if (!this.listeners[event]) {
       this.listeners[event] = new Set();
     }
-    console.warn(`Register ${String(event)} listener`);
     this.listeners[event]!.add(handler);
   }
 
@@ -18,7 +17,6 @@ export class EventBus<Events extends Record<string, unknown>> {
     event: K,
     payload: Events[K]
   ) {
-    console.warn(`Emit ${String(event)} with payload `, payload);
     this.listeners[event]?.forEach(listener => listener(payload));
   }
 }
