@@ -146,8 +146,8 @@ function Grid({ size }: { size: number }) {
         return {
           ...cell,
           coordinate: {
-            x: x ? x : cell.coordinate.x,
-            y: y ? y : cell.coordinate.y,
+            x: x !== undefined ? x : cell.coordinate.x,
+            y: y !== undefined ? y : cell.coordinate.y,
           },
           style: newStyle,
         };
