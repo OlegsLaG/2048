@@ -7,7 +7,8 @@ import { EventStates } from './engine/EventStates.ts';
 
 export interface Grid { coordinate: { x: number, y: number }, occupied: boolean }
 
-export interface ActiveCell {
+export interface ActiveCellType {
+  id: string
   coordinate: {
     x: number,
     y: number,
@@ -33,9 +34,10 @@ new EventStates(bus);
 function Grid({ size }: { size: number }) {
   const hasRun = useRef(false);
   const cellRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const activeCellRef = useRef<ActiveCell[]>([]);
-  const [activeCell, setActiveCell] = useState<ActiveCell[]>([]);
+  const activeCellRef = useRef<ActiveCellType[]>([]);
+  const [activeCell, setActiveCell] = useState<ActiveCellType[]>([]);
   const gridContainer = useRef({ x: 0, y: 0 });
+  const [phase, setPhase] = useState<'idle' | 'moving' | 'merging'>('idle');
 
   const grid = useMemo(() => {
     const arr: Grid[] = [];
@@ -64,7 +66,7 @@ function Grid({ size }: { size: number }) {
     return { x, y };
   };
 
-  const createNewActiveCell = (): ActiveCell | null => {
+  const createNewActiveCell = (): ActiveCellType | null => {
     const occupiedSet = new Set(
       activeCellRef.current.map(c => `${c.coordinate.x}-${c.coordinate.y}`)
     );
@@ -95,6 +97,7 @@ function Grid({ size }: { size: number }) {
     };
 
     return {
+      id: activeKey,
       coordinate: { x, y },
       value: 2,
       style: {
@@ -103,6 +106,29 @@ function Grid({ size }: { size: number }) {
         height: `${cellRect.height}px`,
       },
     };
+  }
+
+  const mergeCells = () => {
+    setActiveCell(prev => {
+      const mergedCells = Object.values(
+        prev.reduce<Record<string, ActiveCellType>>((acc, cell) => {
+          const existing = acc[cell.id];
+
+          if (!existing) {
+            acc[cell.id] = cell;
+          } else if (existing.value === cell.value) {
+            acc[cell.id] = {
+              ...cell,
+              value: cell.value + existing.value,
+            };
+          }
+
+          return acc;
+        }, {})
+      );
+
+      return [...mergedCells];
+    })
   }
 
   const setNewPosition = (direction: keyof typeof Direction) => {
@@ -133,18 +159,19 @@ function Grid({ size }: { size: number }) {
           return cell;
         }
 
-        const relativePosition = {
+        const newRelativePosition = {
           x: cellRect.x - gridContainer.current.x,
           y: cellRect.y - gridContainer.current.y,
         };
 
         const newStyle = {
           ...cell.style,
-          transform: `translate(${relativePosition.x}px, ${relativePosition.y}px)`
+          transform: `translate(${newRelativePosition.x}px, ${newRelativePosition.y}px)`
         };
 
         return {
           ...cell,
+          id: `${x !== undefined ? x : cell.coordinate.x}-${y !== undefined ? y : cell.coordinate.y}`,
           coordinate: {
             x: x !== undefined ? x : cell.coordinate.x,
             y: y !== undefined ? y : cell.coordinate.y,
@@ -155,6 +182,9 @@ function Grid({ size }: { size: number }) {
 
       return [...movedCells];
     });
+    setPhase('moving');
+
+    mergeCells();
   }
 
   const startingCells = Math.round(size / 2);
