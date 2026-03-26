@@ -7,3 +7,5 @@ export const EventList = {
   MOVE_LEFT: 'move_left',
   MOVE_RIGHT: 'move_right',
 } as const;
+
+export type phases = 'idle' | 'moving' | 'merging';

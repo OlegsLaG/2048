@@ -2,7 +2,7 @@ import Cell from './Cell.tsx';
 import ActiveCell from './ActiveCell.tsx';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { EventBus } from './engine/EventBus.ts';
-import { EventList } from './engine/EventList.ts';
+import { EventList, type phases } from './engine/EventList.ts';
 import { EventStates } from './engine/EventStates.ts';
 
 export interface Grid { coordinate: { x: number, y: number }, occupied: boolean }
@@ -37,7 +37,7 @@ function Grid({ size }: { size: number }) {
   const activeCellRef = useRef<ActiveCellType[]>([]);
   const [activeCell, setActiveCell] = useState<ActiveCellType[]>([]);
   const gridContainer = useRef({ x: 0, y: 0 });
-  const [phase, setPhase] = useState<'idle' | 'moving' | 'merging'>('idle');
+  const [phase, setPhase] = useState<phases>('idle');
 
   const grid = useMemo(() => {
     const arr: Grid[] = [];
