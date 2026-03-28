@@ -5,7 +5,7 @@ import { EventBus } from './engine/EventBus.ts';
 import { EventList } from './engine/EventList.ts';
 import { EventStates } from './engine/EventStates.ts';
 
-export interface Grid { coordinate: { x: number, y: number }, occupied: boolean }
+export interface Grid { coordinate: { x: number, y: number } }
 
 export interface ActiveCellType {
   id: string
@@ -44,7 +44,6 @@ function Grid({ size }: { size: number }) {
       for (let j = 0; j < size; j++) {
         arr.push({
           coordinate: { x: i, y: j },
-          occupied: false,
         });
       }
     }
@@ -103,22 +102,24 @@ function Grid({ size }: { size: number }) {
   }
 
   const mergeCells = (movedCells: ActiveCellType[]) => {
-    return Object.values(
-      movedCells.reduce<Record<string, ActiveCellType>>((acc, cell) => {
-        const existing = acc[cell.id];
+    const merged: ActiveCellType[] = [];
+    let skip = false;
 
-        if (!existing) {
-          acc[cell.id] = cell;
-        } else if (existing.value === cell.value) {
-          acc[cell.id] = {
-            ...cell,
-            value: cell.value + existing.value,
-          };
-        }
+    for (let i = 0; i < movedCells.length; i++) {
+      if (skip) { skip = false; continue; }
 
-        return acc;
-      }, {})
-    );
+      if (movedCells[i + 1] && movedCells[i].value === movedCells[i + 1].value) {
+        merged.push({
+          ...movedCells[i],
+          value: movedCells[i].value * 2,
+        });
+        skip = true;
+      } else {
+        merged.push(movedCells[i]);
+      }
+    }
+
+    return merged;
   }
 
   const nextState = (cell: ActiveCellType, x: number, y: number): ActiveCellType => {
@@ -155,23 +156,9 @@ function Grid({ size }: { size: number }) {
   ) => {
     const result: ActiveCellType[] = [];
 
-    rows.forEach((cells, index) => {
-      let target: { x: number, y: number } = { x: 0, y: 0 };
+    rows.forEach((cells) => {
 
-      if (direction === 'ArrowUp') {
-        target = { x: index, y: 0 };
-      }
-      if (direction === 'ArrowRight') {
-        target = { x: size - 1, y: index };
-      }
-      if (direction === 'ArrowDown') {
-        target = { x: index, y: size - 1 };
-      }
-      if (direction === 'ArrowLeft') {
-        target = { x: 0, y: index };
-      }
-
-      cells.sort((a, b) => {
+      const sortedCells = cells.sort((a, b) => {
         if (direction === 'ArrowUp') {
           return a.coordinate.y - b.coordinate.y;
         }
@@ -187,32 +174,35 @@ function Grid({ size }: { size: number }) {
         return 0;
       });
 
-      cells.forEach(cell => {
-        const newCell = nextState(cell, target.x, target.y);
-        result.push(newCell);
+      const mergedCells = mergeCells(sortedCells);
+
+      mergedCells.forEach((cell, index) => {
+        let x = cell.coordinate.x;
+        let y = cell.coordinate.y;
 
         if (direction === 'ArrowUp') {
-          target.y++;
-        }
-        if (direction === 'ArrowRight') {
-          target.x--;
+          y = index;
         }
         if (direction === 'ArrowDown') {
-          target.y--;
+          y = size - 1 - index;
         }
         if (direction === 'ArrowLeft') {
-          target.x++;
+          x = index;
         }
+        if (direction === 'ArrowRight') {
+          x = size - 1 - index;
+        }
+
+        result.push(nextState(cell, x, y));
       });
+
     });
-    return mergeCells(result);
+    return result;
   }
 
   const setNewPosition = (direction: keyof typeof Direction) => {
     setActiveCell(prev => {
       const rows = new Map<number, ActiveCellType[]>();
-      const result: ActiveCellType[] = [];
-
       prev.forEach(cell => {
         const key = direction === 'ArrowUp' || direction === 'ArrowDown'
           ? cell.coordinate.x
@@ -227,9 +217,12 @@ function Grid({ size }: { size: number }) {
 
       const moved = moveCells(rows, direction);
 
-      result.push(...moved);
+      const newCell = createNewActiveCell();
+      if (newCell) {
+        moved.push(newCell);
+      }
 
-      return result;
+      return moved;
     });
   }
 
@@ -266,14 +259,6 @@ function Grid({ size }: { size: number }) {
       if (eventName) {
         bus.emit(eventName, () => {
           setNewPosition(key);
-          // setActiveCell(prev => {
-          //   const newCell = createNewActiveCell();
-          //   if (!newCell) {
-          //     return prev;
-          //   }
-          //
-          //   return [...prev, newCell];
-          // });
         });
       }
     };
@@ -284,7 +269,7 @@ function Grid({ size }: { size: number }) {
       window.removeEventListener('keydown', handler);
     };
 
-  }, [activeCell, setNewPosition]);
+  }, [activeCell, createNewActiveCell, setNewPosition]);
 
   return (
     <div id="grid-container" className="grid-container">
