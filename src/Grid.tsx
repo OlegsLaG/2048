@@ -205,8 +205,7 @@ function Grid({ size }: { size: number }) {
         }
       });
     });
-
-    return result;
+    return mergeCells(result);
   }
 
   const setNewPosition = (direction: keyof typeof Direction) => {
@@ -227,9 +226,8 @@ function Grid({ size }: { size: number }) {
       });
 
       const moved = moveCells(rows, direction);
-      const merged = mergeCells(moved);
 
-      result.push(...merged);
+      result.push(...moved);
 
       return result;
     });
