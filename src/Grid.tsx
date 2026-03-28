@@ -56,7 +56,7 @@ function Grid({ size }: { size: number }) {
     gridTemplateRows: `repeat(${size}, minmax(0, ${500/size}px))`,
   }
 
-  const startingCells = Math.round(size - 1);
+  const startingCells = Math.round(size / 2);
 
   const getFreeCells = () => {
     const occupiedSet = new Set(activeCellRef.current.map(c => c.id));
