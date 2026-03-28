@@ -58,7 +58,7 @@ function Grid({ size }: { size: number }) {
   const startingCells = Math.round(size / 2);
 
   const getFreeCells = () => {
-    const occupiedSet = new Set(activeCellRef.current.map(c => c.id));
+    const occupiedSet = new Set(activeCellRef.current.map(cell => cell.id));
 
     return grid.filter(cell => {
       const key = `${cell.coordinate.x}-${cell.coordinate.y}`;
@@ -90,7 +90,7 @@ function Grid({ size }: { size: number }) {
     };
 
     return {
-      id: activeKey,
+      id: crypto.randomUUID(),
       coordinate: { x, y },
       value: 2,
       style: {
@@ -141,7 +141,6 @@ function Grid({ size }: { size: number }) {
 
     return {
       ...cell,
-      id: `${x}-${y}`,
       coordinate: {
         x,
         y,
@@ -217,9 +216,33 @@ function Grid({ size }: { size: number }) {
 
       const moved = moveCells(rows, direction);
 
-      const newCell = createNewActiveCell();
-      if (newCell) {
-        moved.push(newCell);
+      const occupiedSet = new Set(moved.map(cell => `${cell.coordinate.x}-${cell.coordinate.y}`));
+
+      const freeCells = grid.filter(cell => !occupiedSet.has(`${cell.coordinate.x}-${cell.coordinate.y}`));
+
+      if (freeCells.length > 0) {
+        const randomCell = freeCells[Math.floor(Math.random() * freeCells.length)];
+        const { x, y } = randomCell.coordinate;
+
+        const cellRect = cellRefs.current[`${x}-${y}`]?.getBoundingClientRect();
+
+        if (cellRect) {
+          const relativePosition = {
+            x: cellRect.x - gridContainer.current.x,
+            y: cellRect.y - gridContainer.current.y,
+          };
+
+          moved.push({
+            id: crypto.randomUUID(),
+            coordinate: { x, y },
+            value: 2,
+            style: {
+              transform: `translate(${relativePosition.x}px, ${relativePosition.y}px)`,
+              width: `${cellRect.width}px`,
+              height: `${cellRect.height}px`,
+            },
+          });
+        }
       }
 
       return moved;
@@ -277,10 +300,10 @@ function Grid({ size }: { size: number }) {
         className="background-grid"
         style={gridStyles}
       >
-        {activeCell?.map((cell, index) => (
+        {activeCell?.map((cell) => (
           <ActiveCell
             style={cell?.style}
-            key={index}
+            key={cell.id}
             value={cell.value}
           />
         ))}
