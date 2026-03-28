@@ -2,7 +2,7 @@ import Cell from './Cell.tsx';
 import ActiveCell from './ActiveCell.tsx';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { EventBus } from './engine/EventBus.ts';
-import { EventList, type phases } from './engine/EventList.ts';
+import { EventList } from './engine/EventList.ts';
 import { EventStates } from './engine/EventStates.ts';
 
 export interface Grid { coordinate: { x: number, y: number }, occupied: boolean }
@@ -33,11 +33,10 @@ new EventStates(bus);
 
 function Grid({ size }: { size: number }) {
   const hasRun = useRef(false);
+  const gridContainer = useRef({ x: 0, y: 0 });
   const cellRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const activeCellRef = useRef<ActiveCellType[]>([]);
   const [activeCell, setActiveCell] = useState<ActiveCellType[]>([]);
-  const gridContainer = useRef({ x: 0, y: 0 });
-  const [phase, setPhase] = useState<phases>('idle');
 
   const grid = useMemo(() => {
     const arr: Grid[] = [];
@@ -57,24 +56,19 @@ function Grid({ size }: { size: number }) {
     gridTemplateRows: `repeat(${size}, minmax(0, ${500/size}px))`,
   }
 
-  const randomCoordinate = () => {
-    // eslint-disable-next-line react-hooks/purity
-    const x = Math.floor(Math.random() * (size - 1));
-    // eslint-disable-next-line react-hooks/purity
-    const y = Math.floor(Math.random() * (size - 1));
+  const startingCells = Math.round(size - 1);
 
-    return { x, y };
-  };
+  const getFreeCells = () => {
+    const occupiedSet = new Set(activeCellRef.current.map(c => c.id));
 
-  const createNewActiveCell = (): ActiveCellType | null => {
-    const occupiedSet = new Set(
-      activeCellRef.current.map(c => `${c.coordinate.x}-${c.coordinate.y}`)
-    );
-
-    const freeCells = grid.filter(cell => {
+    return grid.filter(cell => {
       const key = `${cell.coordinate.x}-${cell.coordinate.y}`;
       return !occupiedSet.has(key);
     });
+  }
+
+  const createNewActiveCell = (): ActiveCellType | null => {
+    const freeCells = getFreeCells();
 
     if (freeCells.length === 0) {
       bus.emit(EventList.GAME_OVER, null);
@@ -108,86 +102,138 @@ function Grid({ size }: { size: number }) {
     };
   }
 
-  const mergeCells = () => {
-    setActiveCell(prev => {
-      const mergedCells = Object.values(
-        prev.reduce<Record<string, ActiveCellType>>((acc, cell) => {
-          const existing = acc[cell.id];
+  const mergeCells = (movedCells: ActiveCellType[]) => {
+    return Object.values(
+      movedCells.reduce<Record<string, ActiveCellType>>((acc, cell) => {
+        const existing = acc[cell.id];
 
-          if (!existing) {
-            acc[cell.id] = cell;
-          } else if (existing.value === cell.value) {
-            acc[cell.id] = {
-              ...cell,
-              value: cell.value + existing.value,
-            };
-          }
+        if (!existing) {
+          acc[cell.id] = cell;
+        } else if (existing.value === cell.value) {
+          acc[cell.id] = {
+            ...cell,
+            value: cell.value + existing.value,
+          };
+        }
 
-          return acc;
-        }, {})
-      );
+        return acc;
+      }, {})
+    );
+  }
 
-      return [...mergedCells];
-    })
+  const nextState = (cell: ActiveCellType, x: number, y: number): ActiveCellType => {
+    const cellRect = cellRefs.current[`${x}-${y}`]?.getBoundingClientRect();
+
+    if (!cellRect) {
+      return cell;
+    }
+
+    const newRelativePosition = {
+      x: cellRect.x - gridContainer.current.x,
+      y: cellRect.y - gridContainer.current.y,
+    };
+
+    const newStyle = {
+      ...cell.style,
+      transform: `translate(${newRelativePosition.x}px, ${newRelativePosition.y}px)`
+    };
+
+    return {
+      ...cell,
+      id: `${x}-${y}`,
+      coordinate: {
+        x,
+        y,
+      },
+      style: newStyle,
+    };
+  }
+
+  const moveCells = (
+    rows: Map<number, ActiveCellType[]>,
+    direction: keyof typeof Direction,
+  ) => {
+    const result: ActiveCellType[] = [];
+
+    rows.forEach((cells, index) => {
+      let target: { x: number, y: number } = { x: 0, y: 0 };
+
+      if (direction === 'ArrowUp') {
+        target = { x: index, y: 0 };
+      }
+      if (direction === 'ArrowRight') {
+        target = { x: size - 1, y: index };
+      }
+      if (direction === 'ArrowDown') {
+        target = { x: index, y: size - 1 };
+      }
+      if (direction === 'ArrowLeft') {
+        target = { x: 0, y: index };
+      }
+
+      cells.sort((a, b) => {
+        if (direction === 'ArrowUp') {
+          return a.coordinate.y - b.coordinate.y;
+        }
+        if (direction === 'ArrowDown') {
+          return b.coordinate.y - a.coordinate.y;
+        }
+        if (direction === 'ArrowLeft') {
+          return a.coordinate.x - b.coordinate.x;
+        }
+        if (direction === 'ArrowRight') {
+          return b.coordinate.x - a.coordinate.x;
+        }
+        return 0;
+      });
+
+      cells.forEach(cell => {
+        const newCell = nextState(cell, target.x, target.y);
+        result.push(newCell);
+
+        if (direction === 'ArrowUp') {
+          target.y++;
+        }
+        if (direction === 'ArrowRight') {
+          target.x--;
+        }
+        if (direction === 'ArrowDown') {
+          target.y--;
+        }
+        if (direction === 'ArrowLeft') {
+          target.x++;
+        }
+      });
+    });
+
+    return result;
   }
 
   const setNewPosition = (direction: keyof typeof Direction) => {
-    let x: number | undefined = undefined;
-    let y: number | undefined = undefined;
-
-    if (direction === 'ArrowUp') {
-      y = 0;
-    }
-
-    if (direction === 'ArrowDown') {
-      y = size - 1;
-    }
-
-    if (direction === 'ArrowLeft') {
-      x = 0;
-    }
-
-    if (direction === 'ArrowRight') {
-      x = size - 1;
-    }
-
     setActiveCell(prev => {
-      const movedCells = prev.map((cell) => {
-        const cellRect = cellRefs.current[`${x !== undefined ? x : cell.coordinate.x}-${y !== undefined ? y : cell.coordinate.y}`]?.getBoundingClientRect();
+      const rows = new Map<number, ActiveCellType[]>();
+      const result: ActiveCellType[] = [];
 
-        if (!cellRect) {
-          return cell;
+      prev.forEach(cell => {
+        const key = direction === 'ArrowUp' || direction === 'ArrowDown'
+          ? cell.coordinate.x
+          : cell.coordinate.y;
+
+        if (!rows.has(key)) {
+          rows.set(key, []);
         }
 
-        const newRelativePosition = {
-          x: cellRect.x - gridContainer.current.x,
-          y: cellRect.y - gridContainer.current.y,
-        };
-
-        const newStyle = {
-          ...cell.style,
-          transform: `translate(${newRelativePosition.x}px, ${newRelativePosition.y}px)`
-        };
-
-        return {
-          ...cell,
-          id: `${x !== undefined ? x : cell.coordinate.x}-${y !== undefined ? y : cell.coordinate.y}`,
-          coordinate: {
-            x: x !== undefined ? x : cell.coordinate.x,
-            y: y !== undefined ? y : cell.coordinate.y,
-          },
-          style: newStyle,
-        };
+        rows.get(key)!.push(cell);
       });
 
-      return [...movedCells];
+      const moved = moveCells(rows, direction);
+      const merged = mergeCells(moved);
+
+      result.push(...merged);
+
+      return result;
     });
-    setPhase('moving');
-
-    mergeCells();
   }
-
-  const startingCells = Math.round(size / 2);
 
   useLayoutEffect(() => {
     if (hasRun.current) {
@@ -210,7 +256,7 @@ function Grid({ size }: { size: number }) {
       });
     }
 
-  }, [activeCell, createNewActiveCell, grid, randomCoordinate, size, startingCells]);
+  }, [createNewActiveCell, startingCells]);
 
   useEffect(() => {
     activeCellRef.current = activeCell;
@@ -240,7 +286,7 @@ function Grid({ size }: { size: number }) {
       window.removeEventListener('keydown', handler);
     };
 
-  }, [activeCell, createNewActiveCell, setNewPosition]);
+  }, [activeCell, setNewPosition]);
 
   return (
     <div id="grid-container" className="grid-container">
@@ -267,7 +313,6 @@ function Grid({ size }: { size: number }) {
         ))}
       </div>
     </div>
-
   )
 }
 export default Grid;
