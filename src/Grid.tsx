@@ -161,17 +161,11 @@ function Grid({ size }: { size: number }) {
     rows.forEach((cells) => {
 
       const sortedCells = cells.sort((a, b) => {
-        if (direction === 'ArrowUp') {
+        if (direction === 'ArrowUp' || direction === 'ArrowLeft') {
           return a.coordinate.y - b.coordinate.y;
         }
-        if (direction === 'ArrowDown') {
+        if (direction === 'ArrowDown' || direction === 'ArrowRight') {
           return b.coordinate.y - a.coordinate.y;
-        }
-        if (direction === 'ArrowLeft') {
-          return a.coordinate.x - b.coordinate.x;
-        }
-        if (direction === 'ArrowRight') {
-          return b.coordinate.x - a.coordinate.x;
         }
         return 0;
       });
