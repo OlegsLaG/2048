@@ -57,17 +57,10 @@ function Grid({ size }: { size: number }) {
 
   const startingCells = Math.round(size / 2);
 
-  const getFreeCells = () => {
-    const occupiedSet = new Set(activeCellRef.current.map(cell => cell.id));
-
-    return grid.filter(cell => {
-      const key = `${cell.coordinate.x}-${cell.coordinate.y}`;
-      return !occupiedSet.has(key);
-    });
-  }
-
   const createNewActiveCell = (): ActiveCellType | null => {
-    const freeCells = getFreeCells();
+    const occupiedSet = new Set(activeCellRef.current.map(cell => `${cell.coordinate.x}-${cell.coordinate.y}`));
+
+    const freeCells = grid.filter(cell => !occupiedSet.has(`${cell.coordinate.x}-${cell.coordinate.y}`));
 
     if (freeCells.length === 0) {
       bus.emit(EventList.GAME_OVER, null);
@@ -84,21 +77,30 @@ function Grid({ size }: { size: number }) {
       return null;
     }
 
-    const relativePosition = {
-      x: cellRect.x - gridContainer.current.x,
-      y: cellRect.y - gridContainer.current.y,
-    };
+    if (freeCells.length > 0) {
+      const randomCell = freeCells[Math.floor(Math.random() * freeCells.length)];
+      const { x, y } = randomCell.coordinate;
 
-    return {
-      id: crypto.randomUUID(),
-      coordinate: { x, y },
-      value: 2,
-      style: {
-        transform: `translate(${relativePosition.x}px, ${relativePosition.y}px)`,
-        width: `${cellRect.width}px`,
-        height: `${cellRect.height}px`,
-      },
-    };
+      const cellRect = cellRefs.current[`${x}-${y}`]?.getBoundingClientRect();
+
+      if (cellRect) {
+        const relativePosition = {
+          x: cellRect.x - gridContainer.current.x,
+          y: cellRect.y - gridContainer.current.y,
+        };
+
+        return {
+          id: crypto.randomUUID(),
+          coordinate: { x, y },
+          value: 2,
+          style: {
+            transform: `translate(${relativePosition.x}px, ${relativePosition.y}px)`,
+            width: `${cellRect.width}px`,
+            height: `${cellRect.height}px`,
+          },
+        };
+      }
+    }
   }
 
   const mergeCells = (movedCells: ActiveCellType[]) => {
@@ -159,13 +161,18 @@ function Grid({ size }: { size: number }) {
     const result: ActiveCellType[] = [];
 
     rows.forEach((cells) => {
-
-      const sortedCells = cells.sort((a, b) => {
-        if (direction === 'ArrowUp' || direction === 'ArrowLeft') {
-          return a.coordinate.y - b.coordinate.y;
+      const sortedCells = [...cells].sort((start, end) => {
+        if (direction === 'ArrowUp') {
+          return start.coordinate.y - end.coordinate.y;
         }
-        if (direction === 'ArrowDown' || direction === 'ArrowRight') {
-          return b.coordinate.y - a.coordinate.y;
+        if (direction === 'ArrowDown') {
+          return end.coordinate.y - start.coordinate.y;
+        }
+        if (direction === 'ArrowLeft') {
+          return start.coordinate.x - end.coordinate.x;
+        }
+        if (direction === 'ArrowRight') {
+          return end.coordinate.x - start.coordinate.x;
         }
         return 0;
       });
@@ -212,37 +219,20 @@ function Grid({ size }: { size: number }) {
       });
 
       const moved = moveCells(rows, direction);
+      activeCellRef.current = moved;
 
-      const occupiedSet = new Set(moved.map(cell => `${cell.coordinate.x}-${cell.coordinate.y}`));
+      const newCell = createNewActiveCell();
 
-      const freeCells = grid.filter(cell => !occupiedSet.has(`${cell.coordinate.x}-${cell.coordinate.y}`));
-
-      if (freeCells.length > 0) {
-        const randomCell = freeCells[Math.floor(Math.random() * freeCells.length)];
-        const { x, y } = randomCell.coordinate;
-
-        const cellRect = cellRefs.current[`${x}-${y}`]?.getBoundingClientRect();
-
-        if (cellRect) {
-          const relativePosition = {
-            x: cellRect.x - gridContainer.current.x,
-            y: cellRect.y - gridContainer.current.y,
-          };
-
-          moved.push({
-            id: crypto.randomUUID(),
-            coordinate: { x, y },
-            value: 2,
-            style: {
-              transform: `translate(${relativePosition.x}px, ${relativePosition.y}px)`,
-              width: `${cellRect.width}px`,
-              height: `${cellRect.height}px`,
-            },
-          });
-        }
+      if (newCell) {
+        moved.push(newCell);
       }
 
-      return moved;
+      return moved.sort((start, end) => {
+        if (start.coordinate.y === end.coordinate.y) {
+          return start.coordinate.x - end.coordinate.x;
+        }
+        return start.coordinate.y - end.coordinate.y;
+      });
     });
   }
 
