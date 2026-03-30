@@ -106,7 +106,10 @@ function Grid({ size }: { size: number }) {
     let skip = false;
 
     for (let i = 0; i < movedCells.length; i++) {
-      if (skip) { skip = false; continue; }
+      if (skip) {
+        skip = false;
+        continue;
+      }
 
       if (movedCells[i + 1] && movedCells[i].value === movedCells[i + 1].value) {
         merged.push({
