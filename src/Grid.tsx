@@ -57,7 +57,7 @@ function Grid({ size }: { size: number }) {
 
   const startingCells = Math.round(size / 2);
 
-  const createNewActiveCell = (): ActiveCellType | null => {
+  const createNewActiveCell = (): ActiveCellType | null | undefined => {
     const occupiedSet = new Set(activeCellRef.current.map(cell => `${cell.coordinate.x}-${cell.coordinate.y}`));
 
     const freeCells = grid.filter(cell => !occupiedSet.has(`${cell.coordinate.x}-${cell.coordinate.y}`));
@@ -179,23 +179,42 @@ function Grid({ size }: { size: number }) {
 
       const mergedCells = mergeCells(sortedCells);
 
-      mergedCells.forEach((cell, index) => {
-        let x = cell.coordinate.x;
-        let y = cell.coordinate.y;
+      const occupied = new Set<string>();
 
-        if (direction === 'ArrowUp') {
-          y = index;
-        }
-        if (direction === 'ArrowDown') {
-          y = size - 1 - index;
-        }
-        if (direction === 'ArrowLeft') {
-          x = index;
-        }
-        if (direction === 'ArrowRight') {
-          x = size - 1 - index;
+      mergedCells.forEach((cell) => {
+        let { x, y } = cell.coordinate;
+
+        while (true) {
+          let nextX = x;
+          let nextY = y;
+
+          if (direction === 'ArrowUp') {
+            nextY--;
+          }
+          if (direction === 'ArrowDown') {
+            nextY++;
+          }
+          if (direction === 'ArrowLeft') {
+            nextX--;
+          }
+          if (direction === 'ArrowRight') {
+            nextX++;
+          }
+
+          const key = `${nextX}-${nextY}`;
+
+          if (nextX < 0 || nextY < 0 || nextX >= size || nextY >= size) {
+            break;
+          }
+
+          if (occupied.has(key)) {
+            break;
+          }
+          x = nextX;
+          y = nextY;
         }
 
+        occupied.add(`${x}-${y}`);
         result.push(nextState(cell, x, y));
       });
 
@@ -227,12 +246,7 @@ function Grid({ size }: { size: number }) {
         moved.push(newCell);
       }
 
-      return moved.sort((start, end) => {
-        if (start.coordinate.y === end.coordinate.y) {
-          return start.coordinate.x - end.coordinate.x;
-        }
-        return start.coordinate.y - end.coordinate.y;
-      });
+      return moved;
     });
   }
 
