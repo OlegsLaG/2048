@@ -94,7 +94,7 @@ function Grid({ size }: { size: number }) {
           coordinate: { x, y },
           value: 2,
           style: {
-            transform: `translate(${relativePosition.x}px, ${relativePosition.y}px)`,
+            transform: `translate(${relativePosition.x}px, ${relativePosition.y}px) scale(1)`,
             width: `${cellRect.width}px`,
             height: `${cellRect.height}px`,
           },
@@ -161,7 +161,7 @@ function Grid({ size }: { size: number }) {
     const result: ActiveCellType[] = [];
 
     rows.forEach((cells) => {
-      const sortedCells = [...cells].sort((start, end) => {
+      const sortedCells = cells.sort((start, end) => {
         if (direction === 'ArrowUp') {
           return start.coordinate.y - end.coordinate.y;
         }
@@ -177,11 +177,9 @@ function Grid({ size }: { size: number }) {
         return 0;
       });
 
-      const mergedCells = mergeCells(sortedCells);
-
       const occupied = new Set<string>();
 
-      mergedCells.forEach((cell) => {
+      const movedCells = sortedCells.map((cell) => {
         let { x, y } = cell.coordinate;
 
         while (true) {
@@ -215,9 +213,10 @@ function Grid({ size }: { size: number }) {
         }
 
         occupied.add(`${x}-${y}`);
-        result.push(nextState(cell, x, y));
+        return nextState(cell, x, y);
       });
-
+      const mergedCells = mergeCells(movedCells);
+      result.push(...mergedCells);
     });
     return result;
   }
@@ -239,12 +238,6 @@ function Grid({ size }: { size: number }) {
 
       const moved = moveCells(rows, direction);
       activeCellRef.current = moved;
-
-      const newCell = createNewActiveCell();
-
-      if (newCell) {
-        moved.push(newCell);
-      }
 
       return moved;
     });
@@ -283,6 +276,15 @@ function Grid({ size }: { size: number }) {
       if (eventName) {
         bus.emit(eventName, () => {
           setNewPosition(key);
+          setTimeout(() => {
+            setActiveCell(prev => {
+              const newCell = createNewActiveCell();
+              if (!newCell) {
+                return prev;
+              }
+              return [...prev, newCell];
+            });
+          }, 150);
         });
       }
     };
@@ -305,6 +307,7 @@ function Grid({ size }: { size: number }) {
           <ActiveCell
             style={cell?.style}
             key={cell.id}
+            id={cell.id}
             value={cell.value}
           />
         ))}

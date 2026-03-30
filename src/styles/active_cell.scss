@@ -10,5 +10,52 @@
   background: #eee4db;
   font-size: 40px;
   font-weight: bold;
-  transition: transform 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+  transform: scale(0);
+  color: #776e65;
+
+  &:not(.color-2, .color-4){
+    color: #f8f5f0;
+  }
 }
+
+.color-4 {
+  background: #ebdfc7;
+}
+
+.color-8 {
+  background: #f2b179;
+}
+
+.color-16 {
+  background: #f49462;
+}
+
+.color-32 {
+  background: #f57b5e;
+}
+
+.color-64 {
+  background: #f45c39;
+}
+
+.color-128 {
+  background: #edce70;
+}
+
+.color-256 {
+  background: #eecb60;
+}
+
+.color-512 {
+  background: #ebc74f;
+}
+
+.color-1024 {
+  background: #edc43e;
+}
+
+.color-2048 {
+  background: #ecc02e;
+}
+

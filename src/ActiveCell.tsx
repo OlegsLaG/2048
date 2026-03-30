@@ -1,12 +1,12 @@
 function ActiveCell(
   {
+    id,
     value,
     style,
-  }: { value: number, style: { transform: string, width: string, height: string } }
+  }: { id: string, value: number, style: { transform: string, width: string, height: string } }
 ) {
-
   return (
-    <div className="active-cell" style={style}>
+    <div id={id} className={`active-cell color-${value}`} style={style}>
       {value}
     </div>
   )
