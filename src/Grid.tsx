@@ -158,21 +158,21 @@ function Grid({ size }: { size: number }) {
     const result: ActiveCellType[] = [];
 
     rows.forEach((cells) => {
-      const sorted = [...cells].sort((a, b) => {
+      const sorted = [...cells].sort((start, end) => {
         if (direction === 'ArrowUp') {
-          return a.coordinate.y - b.coordinate.y;
+          return start.coordinate.y - end.coordinate.y;
         }
 
         if (direction === 'ArrowDown') {
-          return b.coordinate.y - a.coordinate.y;
+          return end.coordinate.y - start.coordinate.y;
         }
 
         if (direction === 'ArrowLeft') {
-          return a.coordinate.x - b.coordinate.x;
+          return start.coordinate.x - end.coordinate.x;
         }
 
         if (direction === 'ArrowRight') {
-          return b.coordinate.x - a.coordinate.x;
+          return end.coordinate.x - start.coordinate.x;
         }
         return 0;
       });
