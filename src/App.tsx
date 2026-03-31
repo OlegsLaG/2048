@@ -12,7 +12,7 @@ function App() {
 
   useEffect(() => {
     bus.on(EventList.GAME_OVER, () => {
-      setGameOver(true)
+      setGameOver(true);
     });
   }, []);
 

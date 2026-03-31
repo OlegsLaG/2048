@@ -14,7 +14,8 @@ function GameOver({ showGameOver }: { showGameOver: boolean }) {
         console.warn('GameOver sound blocked or failed:', err);
       });
     }
-  }, [showGameOver])
+  }, [showGameOver]);
+
   return (
     <div className={`game-over-container ${showGameOver ? 'show' : ''}`}></div>
   )
