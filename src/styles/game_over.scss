@@ -15,4 +15,38 @@
   &.show {
     opacity: 1;
   }
+
+  button {
+    color: #f9f6f2;
+    bottom: 40px;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%);
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    opacity: 0;
+    animation-name: fadeIn;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: 1;
+    animation-duration: 0.5s;
+    animation-delay: 5s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
+
+    &.show {
+      animation-play-state: running;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

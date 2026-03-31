@@ -17,7 +17,11 @@ function GameOver({ showGameOver }: { showGameOver: boolean }) {
   }, [showGameOver]);
 
   return (
-    <div className={`game-over-container ${showGameOver ? 'show' : ''}`}></div>
+    <div className={`game-over-container ${showGameOver ? 'show' : null}`}>
+      <button className={`${showGameOver ? 'show' : null}`} onClick={() => window.location.reload()}>
+        Play Again
+      </button>
+    </div>
   )
 }
 
