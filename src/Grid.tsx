@@ -28,10 +28,10 @@ const Direction = {
   ArrowLeft: 'MOVE_LEFT',
 } as const;
 
-const bus = new EventBus();
-new EventStates(bus);
 
-function Grid({ size }: { size: number }) {
+function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknown>> }) {
+  new EventStates(bus);
+
   const hasRun = useRef(false);
   const gridContainer = useRef({ x: 0, y: 0 });
   const cellRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -57,13 +57,48 @@ function Grid({ size }: { size: number }) {
 
   const startingCells = Math.round(size / 2);
 
+  const hasAvailableMoves = (cells: ActiveCellType[], size: number) => {
+    const map = new Map<string, number>();
+
+    cells.forEach(cell => {
+      map.set(`${cell.coordinate.x}-${cell.coordinate.y}`, cell.value);
+    });
+
+    for (let x = 0; x < size; x++) {
+      for (let y = 0; y < size; y++) {
+        const value = map.get(`${x}-${y}`);
+
+        if (!value) {
+          continue;
+        }
+
+        const right = map.get(`${x + 1}-${y}`);
+        if (right === value) {
+          return true;
+        }
+
+        const down = map.get(`${x}-${y + 1}`);
+        if (down === value) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
   const createNewActiveCell = (): ActiveCellType | null | undefined => {
     const occupiedSet = new Set(activeCellRef.current.map(cell => `${cell.coordinate.x}-${cell.coordinate.y}`));
 
     const freeCells = grid.filter(cell => !occupiedSet.has(`${cell.coordinate.x}-${cell.coordinate.y}`));
 
     if (freeCells.length === 0) {
-      bus.emit(EventList.GAME_OVER, null);
+      const hasMoves = hasAvailableMoves(activeCellRef.current, size);
+
+      if (!hasMoves) {
+        bus.emit(EventList.GAME_OVER, null);
+      }
+
       return null;
     }
 
@@ -290,9 +325,7 @@ function Grid({ size }: { size: number }) {
       const key = event.key as keyof typeof Direction;
 
       if (eventName) {
-        bus.emit(eventName, () => {
-          setNewPosition(key);
-        });
+        setNewPosition(key);
       }
     };
 
