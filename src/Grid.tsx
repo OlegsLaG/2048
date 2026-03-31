@@ -105,20 +105,17 @@ function Grid({ size }: { size: number }) {
 
   const mergeCells = (movedCells: ActiveCellType[]) => {
     const merged: ActiveCellType[] = [];
-    let skip = false;
 
     for (let i = 0; i < movedCells.length; i++) {
-      if (skip) {
-        skip = false;
-        continue;
-      }
-
-      if (movedCells[i + 1] && movedCells[i].value === movedCells[i + 1].value) {
+      if (
+        movedCells[i + 1] &&
+        movedCells[i].value === movedCells[i + 1].value
+      ) {
         merged.push({
           ...movedCells[i],
           value: movedCells[i].value * 2,
         });
-        skip = true;
+        i++;
       } else {
         merged.push(movedCells[i]);
       }
@@ -141,7 +138,7 @@ function Grid({ size }: { size: number }) {
 
     const newStyle = {
       ...cell.style,
-      transform: `translate(${newRelativePosition.x}px, ${newRelativePosition.y}px)`
+      transform: `translate(${newRelativePosition.x}px, ${newRelativePosition.y}px) scale(1)`,
     };
 
     return {
@@ -161,87 +158,108 @@ function Grid({ size }: { size: number }) {
     const result: ActiveCellType[] = [];
 
     rows.forEach((cells) => {
-      const sortedCells = cells.sort((start, end) => {
+      const sorted = [...cells].sort((a, b) => {
         if (direction === 'ArrowUp') {
-          return start.coordinate.y - end.coordinate.y;
+          return a.coordinate.y - b.coordinate.y;
         }
+
         if (direction === 'ArrowDown') {
-          return end.coordinate.y - start.coordinate.y;
+          return b.coordinate.y - a.coordinate.y;
         }
+
         if (direction === 'ArrowLeft') {
-          return start.coordinate.x - end.coordinate.x;
+          return a.coordinate.x - b.coordinate.x;
         }
+
         if (direction === 'ArrowRight') {
-          return end.coordinate.x - start.coordinate.x;
+          return b.coordinate.x - a.coordinate.x;
         }
         return 0;
       });
 
-      const occupied = new Set<string>();
+      const merged: ActiveCellType[] = mergeCells(sorted);
 
-      const movedCells = sortedCells.map((cell) => {
-        let { x, y } = cell.coordinate;
+      if (direction === 'ArrowDown') {
+        let y = size - 1;
 
-        while (true) {
-          let nextX = x;
-          let nextY = y;
+        merged.forEach((cell) => {
+          result.push(nextState(cell, cell.coordinate.x, y));
+          y--;
+        });
+      }
 
-          if (direction === 'ArrowUp') {
-            nextY--;
-          }
-          if (direction === 'ArrowDown') {
-            nextY++;
-          }
-          if (direction === 'ArrowLeft') {
-            nextX--;
-          }
-          if (direction === 'ArrowRight') {
-            nextX++;
-          }
+      if (direction === 'ArrowUp') {
+        let y = 0;
 
-          const key = `${nextX}-${nextY}`;
+        merged.forEach((cell) => {
+          result.push(nextState(cell, cell.coordinate.x, y));
+          y++;
+        });
+      }
 
-          if (nextX < 0 || nextY < 0 || nextX >= size || nextY >= size) {
-            break;
-          }
+      if (direction === 'ArrowRight') {
+        let x = size - 1;
 
-          if (occupied.has(key)) {
-            break;
-          }
-          x = nextX;
-          y = nextY;
-        }
+        merged.forEach((cell) => {
+          result.push(nextState(cell, x, cell.coordinate.y));
+          x--;
+        });
+      }
 
-        occupied.add(`${x}-${y}`);
-        return nextState(cell, x, y);
-      });
-      const mergedCells = mergeCells(movedCells);
-      result.push(...mergedCells);
+      if (direction === 'ArrowLeft') {
+        let x = 0;
+
+        merged.forEach((cell) => {
+          result.push(nextState(cell, x, cell.coordinate.y));
+          x++;
+        });
+      }
     });
+
     return result;
-  }
+  };
 
   const setNewPosition = (direction: keyof typeof Direction) => {
-    setActiveCell(prev => {
-      const rows = new Map<number, ActiveCellType[]>();
-      prev.forEach(cell => {
-        const key = direction === 'ArrowUp' || direction === 'ArrowDown'
+    const prevState = activeCellRef.current;
+
+    const rows = new Map<number, ActiveCellType[]>();
+
+    prevState.forEach(cell => {
+      const key =
+        direction === 'ArrowUp' || direction === 'ArrowDown'
           ? cell.coordinate.x
           : cell.coordinate.y;
 
-        if (!rows.has(key)) {
-          rows.set(key, []);
-        }
+      if (!rows.has(key)) {
+        rows.set(key, []);
+      }
 
-        rows.get(key)!.push(cell);
-      });
-
-      const moved = moveCells(rows, direction);
-      activeCellRef.current = moved;
-
-      return moved;
+      rows.get(key)!.push(cell);
     });
-  }
+
+    const moved = moveCells(rows, direction);
+
+    setActiveCell(prevState);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setActiveCell(moved);
+
+        setTimeout(() => {
+          setActiveCell(prev => {
+            activeCellRef.current = prev;
+
+            const newCell = createNewActiveCell();
+            if (!newCell) {
+              return prev;
+            }
+
+            return [...prev, newCell];
+          });
+        }, 200);
+      });
+    });
+  };
 
   useLayoutEffect(() => {
     if (hasRun.current) {
@@ -276,15 +294,6 @@ function Grid({ size }: { size: number }) {
       if (eventName) {
         bus.emit(eventName, () => {
           setNewPosition(key);
-          setTimeout(() => {
-            setActiveCell(prev => {
-              const newCell = createNewActiveCell();
-              if (!newCell) {
-                return prev;
-              }
-              return [...prev, newCell];
-            });
-          }, 150);
         });
       }
     };
@@ -295,7 +304,7 @@ function Grid({ size }: { size: number }) {
       window.removeEventListener('keydown', handler);
     };
 
-  }, [activeCell, createNewActiveCell, setNewPosition]);
+  }, [activeCell, setNewPosition]);
 
   return (
     <div id="grid-container" className="grid-container">
