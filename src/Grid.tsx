@@ -242,22 +242,20 @@ function Grid({ size }: { size: number }) {
     setActiveCell(prevState);
 
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setActiveCell(moved);
+      setActiveCell(moved);
 
-        setTimeout(() => {
-          setActiveCell(prev => {
-            activeCellRef.current = prev;
+      setTimeout(() => {
+        setActiveCell(prev => {
+          activeCellRef.current = prev;
 
-            const newCell = createNewActiveCell();
-            if (!newCell) {
-              return prev;
-            }
+          const newCell = createNewActiveCell();
+          if (!newCell) {
+            return prev;
+          }
 
-            return [...prev, newCell];
-          });
-        }, 200);
-      });
+          return [...prev, newCell];
+        });
+      }, 200);
     });
   };
 
