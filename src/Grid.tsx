@@ -144,6 +144,7 @@ function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknow
         movedCells[i + 1] &&
         movedCells[i].value === movedCells[i + 1].value
       ) {
+        console.warn('merge', movedCells[i], movedCells[i + 1]);
         merged.push({
           ...movedCells[i],
           value: movedCells[i].value * 2,
