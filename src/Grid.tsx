@@ -49,6 +49,8 @@ function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknow
     }
     return arr;
   }, [size]);
+  const gap = 15;
+  const cellSize = (500 - gap * (size - 1)) / size;
 
   const gridStyles = {
     gridTemplateColumns: `repeat(${size}, minmax(0, ${500/size}px))`,
@@ -119,19 +121,15 @@ function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknow
       const cellRect = cellRefs.current[`${x}-${y}`]?.getBoundingClientRect();
 
       if (cellRect) {
-        const relativePosition = {
-          x: cellRect.x - gridContainer.current.x,
-          y: cellRect.y - gridContainer.current.y,
-        };
 
         return {
           id: crypto.randomUUID(),
           coordinate: { x, y },
           value: 2,
           style: {
-            transform: `translate(${relativePosition.x}px, ${relativePosition.y}px) scale(1)`,
-            width: `${cellRect.width}px`,
-            height: `${cellRect.height}px`,
+            width: `${cellSize}px`,
+            height: `${cellSize}px`,
+            transform: `translate(${x * (cellSize + gap) + gap}px, ${y * (cellSize + gap) + gap}px) scale(1)`,
           },
         };
       }
@@ -160,20 +158,10 @@ function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknow
   }
 
   const nextState = (cell: ActiveCellType, x: number, y: number): ActiveCellType => {
-    const cellRect = cellRefs.current[`${x}-${y}`]?.getBoundingClientRect();
-
-    if (!cellRect) {
-      return cell;
-    }
-
-    const newRelativePosition = {
-      x: cellRect.x - gridContainer.current.x,
-      y: cellRect.y - gridContainer.current.y,
-    };
-
     const newStyle = {
-      ...cell.style,
-      transform: `translate(${newRelativePosition.x}px, ${newRelativePosition.y}px) scale(1)`,
+      width: `${cellSize}px`,
+      height: `${cellSize}px`,
+      transform: `translate(${x * (cellSize + gap) + gap}px, ${y * (cellSize + gap) + gap}px) scale(1)`,
     };
 
     return {
@@ -340,7 +328,7 @@ function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknow
   return (
     <div id="grid-container" className="grid-container">
       <div
-        className="background-grid"
+        className="active-grid"
         style={gridStyles}
       >
         {activeCell?.map((cell) => (
@@ -351,6 +339,11 @@ function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknow
             value={cell.value}
           />
         ))}
+      </div>
+      <div
+        className="background-grid"
+        style={gridStyles}
+      >
         {grid.map((cell) => (
           <Cell
             id={`${cell.coordinate.x}-${cell.coordinate.y}`}

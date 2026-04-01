@@ -1,6 +1,29 @@
 .field {
-  margin: 25% auto 0;
+  margin: 0 auto;
   width: 500px;
   height: 500px;
-  transform: translateY(-50%);
+}
+
+.field-header {
+  padding: 15px;
+  display: flex;
+  gap: 15px;
+  justify-content: flex-start;
+  align-items: center;
+  h1, h2, h3, p {
+    margin: 0;
+  }
+}
+
+.header-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #ccc0b3;
+  border-radius: 5px;
+
+  &.game-name {
+    color: #fff;
+  }
 }
