@@ -13,6 +13,13 @@ export class EventBus<Events extends Record<string, unknown>> {
     this.listeners[event]!.add(handler);
   }
 
+  off<K extends keyof Events>(
+    event: K,
+    handler: (payload: Events[K]) => void
+  ) {
+    this.listeners[event]?.delete(handler);
+  }
+
   emit<K extends keyof Events>(
     event: K,
     payload: Events[K]

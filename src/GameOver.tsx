@@ -1,8 +1,14 @@
 import { useEffect, useRef } from 'react';
 import gameOverSoundFile from './assets/sounds/game_over.mp3';
+import { EventList } from './engine/EventList.ts';
+import { EventBus } from './engine/EventBus.ts';
 
-function GameOver({ showGameOver }: { showGameOver: boolean }) {
+function GameOver({ showGameOver, bus }: { showGameOver: boolean,  bus: EventBus<Record<string, unknown>>  }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const startNewGame = () => {
+    bus.emit(EventList.NEW_GAME, null);
+  }
 
   useEffect(() => {
     audioRef.current = new Audio(gameOverSoundFile);
@@ -18,7 +24,7 @@ function GameOver({ showGameOver }: { showGameOver: boolean }) {
 
   return (
     <div className={`game-over-container ${showGameOver ? 'show' : null}`}>
-      <button className={`${showGameOver ? 'show' : null}`} onClick={() => window.location.reload()}>
+      <button className={`${showGameOver ? 'show' : null}`} onClick={startNewGame}>
         Play Again
       </button>
     </div>

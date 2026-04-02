@@ -3,7 +3,6 @@ import ActiveCell from './ActiveCell.tsx';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { EventBus } from './engine/EventBus.ts';
 import { EventList } from './engine/EventList.ts';
-import { EventStates } from './engine/EventStates.ts';
 
 export interface Grid { coordinate: { x: number, y: number } }
 
@@ -28,15 +27,14 @@ const Direction = {
   ArrowLeft: 'MOVE_LEFT',
 } as const;
 
-
-function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknown>> }) {
-  new EventStates(bus);
+function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<string, unknown>>, onScore: (newScore: number) => void }) {
 
   const hasRun = useRef(false);
   const gridContainer = useRef({ x: 0, y: 0 });
   const cellRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const activeCellRef = useRef<ActiveCellType[]>([]);
   const [activeCell, setActiveCell] = useState<ActiveCellType[]>([]);
+  const isAnimatingRef = useRef(false);
 
   const grid = useMemo(() => {
     const arr: Grid[] = [];
@@ -138,25 +136,34 @@ function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknow
 
   const mergeCells = (movedCells: ActiveCellType[]) => {
     const merged: ActiveCellType[] = [];
+    let gainedScore = 0;
 
     for (let i = 0; i < movedCells.length; i++) {
       if (
         movedCells[i + 1] &&
         movedCells[i].value === movedCells[i + 1].value
       ) {
-        console.warn('merge', movedCells[i], movedCells[i + 1]);
+        const newValue = movedCells[i].value * 2;
+
+        gainedScore += newValue;
+
         merged.push({
           ...movedCells[i],
-          value: movedCells[i].value * 2,
+          value: newValue,
         });
+
         i++;
       } else {
         merged.push(movedCells[i]);
       }
     }
 
+    if (gainedScore > 0) {
+      onScore(gainedScore);
+    }
+
     return merged;
-  }
+  };
 
   const nextState = (cell: ActiveCellType, x: number, y: number): ActiveCellType => {
     const newStyle = {
@@ -244,6 +251,11 @@ function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknow
   };
 
   const setNewPosition = (direction: keyof typeof Direction) => {
+    if (isAnimatingRef.current) {
+      return;
+    }
+    isAnimatingRef.current = true;
+
     const prevState = activeCellRef.current;
 
     const rows = new Map<number, ActiveCellType[]>();
@@ -279,8 +291,24 @@ function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknow
 
           return [...prev, newCell];
         });
-      }, 200);
+        isAnimatingRef.current = false;
+      }, 300);
     });
+  };
+
+  const startNewGame = () => {
+    const newCells: ActiveCellType[] = [];
+    activeCellRef.current = [];
+
+    for (let i = 0; i < startingCells; i++) {
+      const cell = createNewActiveCell();
+      if (cell) {
+        newCells.push(cell);
+        activeCellRef.current.push(cell);
+      }
+    }
+
+    setActiveCell(newCells);
   };
 
   useLayoutEffect(() => {
@@ -292,19 +320,8 @@ function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknow
 
     gridContainer.current = document.getElementById('grid-container')?.getBoundingClientRect() || { x: 0, y: 0 };
 
-    for (let i = 0; i < startingCells; i++) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveCell(prev => {
-        const newCell = createNewActiveCell();
-        if (!newCell) {
-          return prev;
-        }
-
-        return [...prev, newCell];
-      });
-    }
-
-  }, [createNewActiveCell, startingCells]);
+    startNewGame();
+  });
 
   useEffect(() => {
     activeCellRef.current = activeCell;
@@ -324,7 +341,17 @@ function Grid({ size, bus }: { size: number, bus: EventBus<Record<string, unknow
       window.removeEventListener('keydown', handler);
     };
 
-  }, [activeCell, setNewPosition]);
+  });
+
+  useEffect(() => {
+    const handler = () => startNewGame();
+
+    bus.on(EventList.NEW_GAME, handler);
+
+    return () => {
+      bus.off(EventList.NEW_GAME, handler);
+    };
+  });
 
   return (
     <div id="grid-container" className="grid-container">

@@ -15,11 +15,9 @@ function ActiveCell(
       prevValueRef.current = value;
       setIsMerging(true);
 
-      const timeout = setTimeout(() => {
+      setTimeout(() => {
         setIsMerging(false);
       }, 300);
-
-      return () => clearTimeout(timeout);
     }
   }, [value]);
   return (
