@@ -1,5 +1,6 @@
 import Field from './Field.tsx';
 import GameOver from './GameOver.tsx';
+import GameWon from './GameWon.tsx';
 import { EventBus } from './engine/EventBus.ts';
 import { useEffect, useState } from 'react';
 import { EventList } from './engine/EventList.ts';
@@ -9,14 +10,17 @@ const cells = 4;
 
 function App() {
   const [gameOver, setGameOver] = useState(false);
+  const [gameWon, setGameWon] = useState(false);
 
   const onGameOver = () => {
-    console.warn('Game Over');
     setGameOver(true);
   };
 
+  const onGameWon = () => {
+    setGameWon(true);
+  };
+
   const onNewGame = () => {
-    console.warn('New Game');
     setGameOver(false);
   };
 
@@ -24,7 +28,15 @@ function App() {
     bus.on(EventList.GAME_OVER, onGameOver);
 
     return () => {
-      bus.off(EventList.GAME_OVER, onGameOver);
+      bus.off(EventList.GAME_OVER, () => {});
+    };
+  });
+
+  useEffect(() => {
+    bus.on(EventList.GAME_WON, onGameWon);
+
+    return () => {
+      bus.off(EventList.GAME_WON, () => {});
     };
   });
 
@@ -32,13 +44,14 @@ function App() {
     bus.on(EventList.NEW_GAME, onNewGame);
 
     return () => {
-      bus.off(EventList.NEW_GAME, onNewGame);
+      bus.off(EventList.NEW_GAME, () => {});
     };
   });
 
   return (
     <div>
       <GameOver showGameOver={gameOver} bus={bus} />
+      <GameWon showGameWon={gameWon} bus={bus} />
       <Field size={cells} bus={bus} />
     </div>
   )

@@ -8,6 +8,16 @@ function Field({ size, bus }: { size: number, bus: EventBus<Record<string, unkno
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
 
+  const updateBestScore = (score: number) => {
+    setBestScore(prev => {
+      if (score > prev) {
+        localStorage.setItem('bestScore', String(score));
+        return score;
+      }
+      return prev;
+    });
+  };
+
   useEffect(() => {
     const saved = localStorage.getItem('bestScore');
 
@@ -17,32 +27,33 @@ function Field({ size, bus }: { size: number, bus: EventBus<Record<string, unkno
   }, []);
 
   useEffect(() => {
-    bus.on(EventList.GAME_OVER, () => {
+    const handler = () => {
+      console.warn('Game Over', score);
+      updateBestScore(score);
       setScore(0);
-      setBestScore(Number(score))
-    });
+    };
+
+    bus.on(EventList.GAME_OVER, handler);
 
     return () => {
-      bus.off(EventList.GAME_OVER, () => {
-        setScore(0);
-        setBestScore(Number(score))
-      });
-    }
-  });
+      bus.off(EventList.GAME_OVER, handler);
+    };
+  }, [bus, score]);
 
   useEffect(() => {
-    bus.on(EventList.GAME_WON, () => {
+    const handler = () => {
+      console.warn('Game Over', score);
+      updateBestScore(score);
       setScore(0);
-      setBestScore(Number(score))
-    });
+    };
+
+    bus.on(EventList.GAME_WON, handler);
 
     return () => {
-      bus.off(EventList.GAME_WON, () => {
-        setScore(0);
-        setBestScore(Number(score))
-      });
-    }
-  });
+      bus.off(EventList.GAME_WON, handler);
+    };
+  }, [bus, score]);
+
   return (
     <div className="field">
       <FieldHeader size={size} score={score} bestScore={bestScore} />

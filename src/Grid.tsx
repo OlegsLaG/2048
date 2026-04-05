@@ -189,7 +189,7 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     const result: ActiveCellType[] = [];
 
     rows.forEach((cells) => {
-      const sorted = [...cells].sort((start, end) => {
+      const sorted = cells.sort((start, end) => {
         if (direction === 'ArrowUp') {
           return start.coordinate.y - end.coordinate.y;
         }
@@ -275,7 +275,7 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
 
     const moved = moveCells(rows, direction);
 
-    setActiveCell(prevState);
+    setActiveCell(moved);
 
     requestAnimationFrame(() => {
       setActiveCell(moved);
