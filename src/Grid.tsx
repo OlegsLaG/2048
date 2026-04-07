@@ -116,13 +116,12 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
         gainedScore += newValue;
         merged.push({
           ...movedCells[i],
-          id: crypto.randomUUID(),
           value: newValue,
           is_merged: true,
         });
         i++;
       } else {
-        merged.push(movedCells[i]);
+        merged.push({ ...movedCells[i], is_merged: false });
       }
     }
 
@@ -312,6 +311,7 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
             grid_size={size}
             grid_gap={gap}
             value={cell.value}
+            is_merged={cell.is_merged}
           />
         ))}
       </div>

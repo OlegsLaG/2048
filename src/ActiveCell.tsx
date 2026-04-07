@@ -46,9 +46,7 @@ function ActiveCell(
   }, [coordinate.x, coordinate.y]);
 
   useEffect(() => {
-
     if (is_merged) {
-      console.warn('is_merged', is_merged);
       setIsMerging(true);
       setTimeout(() => setIsMerging(false), 300);
     }
