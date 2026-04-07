@@ -1,25 +1,67 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
+import type {ActiveCellType} from "./utils/types.ts";
 
 function ActiveCell(
   {
     id,
     value,
-    style,
-  }: { id: string, value: number, style: { transform: string, width: string, height: string } }
+    prev_coordinate,
+    coordinate,
+    grid_size,
+    is_merged,
+  }: ActiveCellType
 ) {
+  const gap = 15;
+  const cellSize = (500 - (gap) * ((grid_size || 4) - 1)) / (grid_size || 4);
+
+  console.warn(1);
+
+  const getPosition = (coord: { x: number, y: number }) => ({
+    width: `${cellSize}px`,
+    height: `${cellSize}px`,
+    transform: `translate(${coord.x * (cellSize + gap) + gap}px, ${coord.y * (cellSize + gap) + gap}px)`
+  });
+
   const [isMerging, setIsMerging] = useState(false);
-  const prevValueRef = useRef(value);
+
+  const [style, setStyle] = useState(() =>
+    getPosition(prev_coordinate || coordinate)
+  );
+
+  useLayoutEffect(() => {
+    console.warn(2);
+    if (!prev_coordinate) {
+      return;
+    }
+
+    if (prev_coordinate.x === coordinate.x && prev_coordinate.y === coordinate.y) {
+      return;
+    }
+
+    console.warn(3);
+
+    const from = getPosition(prev_coordinate);
+    const to = getPosition(coordinate);
+    console.warn(4);
+
+    setStyle(from);
+
+    requestAnimationFrame(() => {
+      console.warn(5);
+      setStyle(to);
+    });
+  }, [coordinate.x, coordinate.y]);
 
   useEffect(() => {
-    if (prevValueRef.current !== value) {
-      prevValueRef.current = value;
-      setIsMerging(true);
+    console.warn(6);
 
-      setTimeout(() => {
-        setIsMerging(false);
-      }, 300);
+    if (is_merged) {
+      setIsMerging(true);
+      setTimeout(() => setIsMerging(false), 300);
     }
-  }, [value]);
+  }, [is_merged]);
+  console.warn(7);
+
   return (
     <div id={id} className={`active-cell color-${value} ${isMerging ? 'merging' : ''}`} style={style}>
       <div className="cell-content">

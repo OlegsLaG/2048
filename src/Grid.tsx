@@ -3,32 +3,10 @@ import ActiveCell from './ActiveCell.tsx';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { EventBus } from './engine/EventBus.ts';
 import { EventList } from './engine/EventList.ts';
-
-export interface Grid { coordinate: { x: number, y: number } }
-
-export interface ActiveCellType {
-  id: string
-  coordinate: {
-    x: number,
-    y: number,
-  },
-  value: number,
-  style: {
-    transform: string,
-    width: string,
-    height: string,
-  },
-}
-
-const Direction = {
-  ArrowUp: 'MOVE_UP',
-  ArrowRight: 'MOVE_RIGHT',
-  ArrowDown: 'MOVE_DOWN',
-  ArrowLeft: 'MOVE_LEFT',
-} as const;
+import type { ActiveCellType, Grid } from './utils/types.ts';
+import { Direction } from './utils/types.ts';
 
 function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<string, unknown>>, onScore: (newScore: number) => void }) {
-
   const hasRun = useRef(false);
   const gridContainer = useRef({ x: 0, y: 0 });
   const cellRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -47,6 +25,7 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     }
     return arr;
   }, [size]);
+
   const gap = 15;
   const cellSize = (500 - gap * (size - 1)) / size;
 
@@ -83,13 +62,11 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
         }
       }
     }
-
     return false;
   };
 
   const createNewActiveCell = (): ActiveCellType | null | undefined => {
     const occupiedSet = new Set(activeCellRef.current.map(cell => `${cell.coordinate.x}-${cell.coordinate.y}`));
-
     const freeCells = grid.filter(cell => !occupiedSet.has(`${cell.coordinate.x}-${cell.coordinate.y}`));
 
     if (freeCells.length === 0) {
@@ -98,28 +75,23 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
       if (!hasMoves) {
         bus.emit(EventList.GAME_OVER, null);
       }
-
       return null;
     }
 
     const randomCell = freeCells[Math.floor(Math.random() * freeCells.length)];
     const { x, y } = randomCell.coordinate;
-
     const activeKey = `${x}-${y}`;
     const cellRect = cellRefs.current[activeKey]?.getBoundingClientRect();
 
     if (!cellRect) {
       return null;
     }
-
     if (freeCells.length > 0) {
       const randomCell = freeCells[Math.floor(Math.random() * freeCells.length)];
       const { x, y } = randomCell.coordinate;
-
       const cellRect = cellRefs.current[`${x}-${y}`]?.getBoundingClientRect();
 
       if (cellRect) {
-
         return {
           id: crypto.randomUUID(),
           coordinate: { x, y },
@@ -139,19 +111,15 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     let gainedScore = 0;
 
     for (let i = 0; i < movedCells.length; i++) {
-      if (
-        movedCells[i + 1] &&
-        movedCells[i].value === movedCells[i + 1].value
-      ) {
+      if ( movedCells[i + 1] && movedCells[i].value === movedCells[i + 1].value ) {
         const newValue = movedCells[i].value * 2;
-
         gainedScore += newValue;
-
         merged.push({
           ...movedCells[i],
+          id: crypto.randomUUID(),
           value: newValue,
+          is_merged: true,
         });
-
         i++;
       } else {
         merged.push(movedCells[i]);
@@ -166,30 +134,18 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
   };
 
   const nextState = (cell: ActiveCellType, x: number, y: number): ActiveCellType => {
-    const newStyle = {
-      width: `${cellSize}px`,
-      height: `${cellSize}px`,
-      transform: `translate(${x * (cellSize + gap) + gap}px, ${y * (cellSize + gap) + gap}px) scale(1)`,
-    };
-
     return {
       ...cell,
-      coordinate: {
-        x,
-        y,
-      },
-      style: newStyle,
+      prev_coordinate: cell.coordinate,
+      coordinate: { x, y },
     };
   }
 
-  const moveCells = (
-    rows: Map<number, ActiveCellType[]>,
-    direction: keyof typeof Direction,
-  ) => {
+  const moveCells = ( rows: Map<number, ActiveCellType[]>, direction: keyof typeof Direction, ) => {
     const result: ActiveCellType[] = [];
 
     rows.forEach((cells) => {
-      const sorted = cells.sort((start, end) => {
+      const sorted = [...cells].sort((start, end) => {
         if (direction === 'ArrowUp') {
           return start.coordinate.y - end.coordinate.y;
         }
@@ -212,7 +168,6 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
 
       if (direction === 'ArrowDown') {
         let y = size - 1;
-
         merged.forEach((cell) => {
           result.push(nextState(cell, cell.coordinate.x, y));
           y--;
@@ -221,7 +176,6 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
 
       if (direction === 'ArrowUp') {
         let y = 0;
-
         merged.forEach((cell) => {
           result.push(nextState(cell, cell.coordinate.x, y));
           y++;
@@ -230,7 +184,6 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
 
       if (direction === 'ArrowRight') {
         let x = size - 1;
-
         merged.forEach((cell) => {
           result.push(nextState(cell, x, cell.coordinate.y));
           x--;
@@ -239,7 +192,6 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
 
       if (direction === 'ArrowLeft') {
         let x = 0;
-
         merged.forEach((cell) => {
           result.push(nextState(cell, x, cell.coordinate.y));
           x++;
@@ -254,45 +206,35 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     if (isAnimatingRef.current) {
       return;
     }
+
     isAnimatingRef.current = true;
-
     const prevState = activeCellRef.current;
-
     const rows = new Map<number, ActiveCellType[]>();
 
     prevState.forEach(cell => {
-      const key =
-        direction === 'ArrowUp' || direction === 'ArrowDown'
-          ? cell.coordinate.x
-          : cell.coordinate.y;
+      const key = direction === 'ArrowUp' || direction === 'ArrowDown' ? cell.coordinate.x : cell.coordinate.y;
 
       if (!rows.has(key)) {
         rows.set(key, []);
       }
-
       rows.get(key)!.push(cell);
     });
 
     const moved = moveCells(rows, direction);
 
-    setActiveCell(moved);
+    setActiveCell(prevState);
 
     requestAnimationFrame(() => {
       setActiveCell(moved);
-
       setTimeout(() => {
         setActiveCell(prev => {
           activeCellRef.current = prev;
-
           const newCell = createNewActiveCell();
-          if (!newCell) {
-            return prev;
-          }
-
-          return [...prev, newCell];
+          return newCell ? [...prev, newCell] : prev;
         });
         isAnimatingRef.current = false;
-      }, 300);
+
+        }, 300);
     });
   };
 
@@ -302,6 +244,7 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
 
     for (let i = 0; i < startingCells; i++) {
       const cell = createNewActiveCell();
+
       if (cell) {
         newCells.push(cell);
         activeCellRef.current.push(cell);
@@ -309,6 +252,7 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     }
 
     setActiveCell(newCells);
+
   };
 
   useLayoutEffect(() => {
@@ -317,7 +261,6 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     }
 
     hasRun.current = true;
-
     gridContainer.current = document.getElementById('grid-container')?.getBoundingClientRect() || { x: 0, y: 0 };
 
     startNewGame();
@@ -325,7 +268,6 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
 
   useEffect(() => {
     activeCellRef.current = activeCell;
-
     const handler = (event: KeyboardEvent) => {
       const eventName = EventList[Direction[event.key as keyof typeof Direction]];
       const key = event.key as keyof typeof Direction;
@@ -336,11 +278,9 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     };
 
     window.addEventListener('keydown', handler);
-
     return () => {
       window.removeEventListener('keydown', handler);
     };
-
   });
 
   useEffect(() => {
@@ -354,7 +294,10 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
   });
 
   return (
-    <div id="grid-container" className="grid-container">
+    <div
+      id="grid-container"
+      className="grid-container"
+    >
       <div
         className="active-grid"
         style={gridStyles}
@@ -364,6 +307,10 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
             style={cell?.style}
             key={cell.id}
             id={cell.id}
+            prev_coordinate={cell.prev_coordinate}
+            coordinate={cell.coordinate}
+            grid_size={size}
+            grid_gap={gap}
             value={cell.value}
           />
         ))}
