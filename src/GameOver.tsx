@@ -24,7 +24,10 @@ function GameOver({ showGameOver, bus }: { showGameOver: boolean,  bus: EventBus
 
   return (
     <div className={`game-over-container ${showGameOver ? 'show' : null}`}>
-      <button className={`${showGameOver ? 'show' : null}`} onClick={startNewGame}>
+      <button
+        className={`${showGameOver ? 'show' : null}`}
+        onClick={startNewGame}
+      >
         Play Again
       </button>
     </div>

@@ -10,7 +10,7 @@ const cells = 4;
 
 function App() {
   const [gameOver, setGameOver] = useState(false);
-  const [gameWon, setGameWon] = useState(false);
+  const [gameWon, setGameWon] = useState(true);
 
   const onGameOver = () => {
     setGameOver(true);
@@ -22,6 +22,7 @@ function App() {
 
   const onNewGame = () => {
     setGameOver(false);
+    setGameWon(false);
   };
 
   useEffect(() => {

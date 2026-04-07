@@ -47,8 +47,23 @@
   }
 }
 
-.game-won-container {
-  background-image: url('../assets/images/game_won.gif');
+.game-won {
+  &-container {
+    background-color: rgba(255, 255, 255, 0.4);
+    background-image: url('../assets/images/game_won.gif');
+  }
+
+  &-content {
+    padding: 20px;
+    margin: 25% auto;
+    width: fit-content;
+    height: 200px;
+    transform: translateY(-25%);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #040404;
+    border-radius: 5px;
+  }
 }
 
 @keyframes fadeIn {

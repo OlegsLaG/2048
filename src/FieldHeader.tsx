@@ -9,6 +9,7 @@ function FieldHeader({ size, score, bestScore }: { size: number, score: number, 
   useEffect(() => {
     if (prevValueRef.current !== score) {
       prevValueRef.current = score;
+      localStorage.setItem('score', String(score));
       setIsUpdating(true);
 
       setTimeout(() => {

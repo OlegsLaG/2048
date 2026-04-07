@@ -6,6 +6,7 @@ import { EventBus } from './engine/EventBus.ts';
 function GameWon({ showGameWon, bus }: { showGameWon: boolean,  bus: EventBus<Record<string, unknown>>  }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [score, setScore] = useState<string | null>(null);
+  const [bestScore, setBestScore] = useState<string | null>(null);
 
   const startNewGame = () => {
     bus.emit(EventList.NEW_GAME, null);
@@ -13,7 +14,10 @@ function GameWon({ showGameWon, bus }: { showGameWon: boolean,  bus: EventBus<Re
 
   useEffect(() => {
     audioRef.current = new Audio(gameWonSoundFile);
-    setScore(() => localStorage.getItem('bestScore'));
+    setScore(() => localStorage.getItem('score'));
+    setBestScore(() => localStorage.getItem('bestScore'));
+
+    console.warn(score, bestScore);
 
     const audio = audioRef.current;
     if (audio && showGameWon) {
@@ -26,10 +30,16 @@ function GameWon({ showGameWon, bus }: { showGameWon: boolean,  bus: EventBus<Re
 
   return (
     <div className={`game-won-container ${showGameWon ? 'show' : null}`}>
-      <div>
+      <div className={'game-won-content'}>
         <h1>Congratulations! You won!</h1>
-        <p>You've reached {score}</p>
-        <button className={`${showGameWon ? 'show' : null}`} onClick={startNewGame}>
+        {score && bestScore && score < bestScore
+          ? <p>You've reached {score} and have beaten your highest score {bestScore}</p>
+          : <p>You've reached {score}</p>
+        }
+        <button
+          className={`${showGameWon ? 'show' : null}`}
+          onClick={startNewGame}
+        >
           Play Again
         </button>
       </div>
