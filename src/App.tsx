@@ -10,7 +10,7 @@ const cells = 4;
 
 function App() {
   const [gameOver, setGameOver] = useState(false);
-  const [gameWon, setGameWon] = useState(true);
+  const [gameWon, setGameWon] = useState(false);
 
   const onGameOver = () => {
     setGameOver(true);

@@ -14,8 +14,6 @@ function ActiveCell(
   const gap = 15;
   const cellSize = (500 - (gap) * ((grid_size || 4) - 1)) / (grid_size || 4);
 
-  console.warn(1);
-
   const getPosition = (coord: { x: number, y: number }) => ({
     width: `${cellSize}px`,
     height: `${cellSize}px`,
@@ -29,7 +27,6 @@ function ActiveCell(
   );
 
   useLayoutEffect(() => {
-    console.warn(2);
     if (!prev_coordinate) {
       return;
     }
@@ -38,29 +35,24 @@ function ActiveCell(
       return;
     }
 
-    console.warn(3);
-
     const from = getPosition(prev_coordinate);
     const to = getPosition(coordinate);
-    console.warn(4);
 
     setStyle(from);
 
     requestAnimationFrame(() => {
-      console.warn(5);
       setStyle(to);
     });
   }, [coordinate.x, coordinate.y]);
 
   useEffect(() => {
-    console.warn(6);
 
     if (is_merged) {
+      console.warn('is_merged', is_merged);
       setIsMerging(true);
       setTimeout(() => setIsMerging(false), 300);
     }
   }, [is_merged]);
-  console.warn(7);
 
   return (
     <div id={id} className={`active-cell color-${value} ${isMerging ? 'merging' : ''}`} style={style}>
