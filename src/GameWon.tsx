@@ -17,8 +17,6 @@ function GameWon({ showGameWon, bus }: { showGameWon: boolean,  bus: EventBus<Re
     setScore(() => localStorage.getItem('score'));
     setBestScore(() => localStorage.getItem('bestScore'));
 
-    console.warn(score, bestScore);
-
     const audio = audioRef.current;
     if (audio && showGameWon) {
       audio.currentTime = 0;

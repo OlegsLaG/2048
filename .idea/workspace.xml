@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="071badb1-5112-4292-9564-723ea9d0f247" name="Changes" comment="" />
+    <list default="true" id="071badb1-5112-4292-9564-723ea9d0f247" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ActiveCell.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/ActiveCell.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GameWon.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameWon.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Grid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/Grid.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/styles/active_cell.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles/active_cell.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/types.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,10 +23,22 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/opt/homebrew/Cellar/php/8.2.12/bin/php" />
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 8
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "OlegsLaG"
+  }
 }]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/OlegsLaG/2048",
+    "accountId": "5093f02c-d5c7-462a-abcb-da1a293a453a"
+  }
+}]]></component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/opt/homebrew/Cellar/php/8.2.12/bin/php" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="3BJ43qEqmuLSxzvyzr2orLzmlPV" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -30,8 +49,11 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/Users/o.blass/PhpstormProjects/2048",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -48,7 +70,7 @@
 }]]></component>
   <component name="RunManager" selected="npm.npm dev">
     <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/../2048/package.json" />
+      <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="build" />
@@ -58,7 +80,7 @@
       <method v="2" />
     </configuration>
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/../2048/package.json" />
+      <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="dev" />
@@ -68,7 +90,7 @@
       <method v="2" />
     </configuration>
     <configuration name="npm dev" type="js.build_tools.npm">
-      <package-json value="$PROJECT_DIR$/../2048/package.json" />
+      <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="dev" />
@@ -100,6 +122,7 @@
       <option name="presentableId" value="Default" />
       <updated>1774193642958</updated>
       <workItem from="1774193644015" duration="13073000" />
+      <workItem from="1777478476654" duration="3828000" />
     </task>
     <servers />
   </component>

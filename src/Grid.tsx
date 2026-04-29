@@ -27,7 +27,6 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
   }, [size]);
 
   const gap = 15;
-  const cellSize = (500 - gap * (size - 1)) / size;
 
   const gridStyles = {
     gridTemplateColumns: `repeat(${size}, minmax(0, ${500/size}px))`,
@@ -81,7 +80,7 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     const randomCell = freeCells[Math.floor(Math.random() * freeCells.length)];
     const { x, y } = randomCell.coordinate;
     const activeKey = `${x}-${y}`;
-    const cellRect = cellRefs.current[activeKey]?.getBoundingClientRect();
+    const cellRect = cellRefs.current[activeKey];
 
     if (!cellRect) {
       return null;
@@ -89,18 +88,13 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     if (freeCells.length > 0) {
       const randomCell = freeCells[Math.floor(Math.random() * freeCells.length)];
       const { x, y } = randomCell.coordinate;
-      const cellRect = cellRefs.current[`${x}-${y}`]?.getBoundingClientRect();
+      const cellRect = cellRefs.current[`${x}-${y}`];
 
       if (cellRect) {
         return {
           id: crypto.randomUUID(),
           coordinate: { x, y },
           value: 2,
-          style: {
-            width: `${cellSize}px`,
-            height: `${cellSize}px`,
-            transform: `translate(${x * (cellSize + gap) + gap}px, ${y * (cellSize + gap) + gap}px) scale(1)`,
-          },
         };
       }
     }

@@ -9,8 +9,6 @@ export interface ActiveCellType {
   value: number,
   style?: {
     transform: string,
-    width: string,
-    height: string,
   },
   prev_coordinate?: {
     x: number,

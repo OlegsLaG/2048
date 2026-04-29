@@ -1,5 +1,5 @@
-import { useEffect, useLayoutEffect, useState } from "react";
-import type {ActiveCellType} from "./utils/types.ts";
+import { useEffect, useLayoutEffect, useState } from 'react';
+import type { ActiveCellType } from './utils/types.ts';
 
 function ActiveCell(
   {
@@ -17,7 +17,7 @@ function ActiveCell(
   const getPosition = (coord: { x: number, y: number }) => ({
     width: `${cellSize}px`,
     height: `${cellSize}px`,
-    transform: `translate(${coord.x * (cellSize + gap) + gap}px, ${coord.y * (cellSize + gap) + gap}px)`
+    transform: `translate(${coord.x * (cellSize + gap) + gap}px, ${coord.y * (cellSize + gap) + gap}px) scale(1)`
   });
 
   const [isMerging, setIsMerging] = useState(false);
