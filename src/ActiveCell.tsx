@@ -15,8 +15,6 @@ function ActiveCell(
   const cellSize = (500 - (gap) * ((grid_size || 4) - 1)) / (grid_size || 4);
 
   const getPosition = (coord: { x: number, y: number }) => ({
-    width: `${cellSize}px`,
-    height: `${cellSize}px`,
     transform: `translate(${coord.x * (cellSize + gap) + gap}px, ${coord.y * (cellSize + gap) + gap}px) scale(1)`
   });
 

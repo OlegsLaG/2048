@@ -1,4 +1,9 @@
+$gap: 15px;
+$cellSize: (500 - ($gap) * (4 - 1)) / 4;
+
 .active-cell {
+  width: $cellSize;
+  height: $cellSize;
   position: absolute;
   top: 0;
   left: 0;
@@ -11,7 +16,6 @@
   font-size: 40px;
   font-weight: bold;
   transition: transform 0.2s ease-in-out, background 0.2s ease-in-out, opacity 0.1s ease-in-out;
-  transform: scale(0);
   color: #776e65;
   content-visibility: visible;
 
