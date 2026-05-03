@@ -17,6 +17,7 @@ export interface ActiveCellType {
   grid_size?: number,
   grid_gap?: number,
   is_merged?: boolean,
+  merge_into?: boolean,
 }
 
 export const Direction = {

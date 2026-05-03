@@ -14,8 +14,8 @@ function ActiveCell(
   const gap = 15;
   const cellSize = (500 - (gap) * ((grid_size || 4) - 1)) / (grid_size || 4);
 
-  const getPosition = (coord: { x: number, y: number }) => ({
-    transform: `translate(${coord.x * (cellSize + gap) + gap}px, ${coord.y * (cellSize + gap) + gap}px) scale(1)`
+  const getPosition = (coord: { x: number, y: number }, scale: number = 1) => ({
+    transform: `translate(${coord.x * (cellSize + gap) + gap}px, ${coord.y * (cellSize + gap) + gap}px) scale(${scale})`
   });
 
   const [isMerging, setIsMerging] = useState(false);
@@ -46,7 +46,11 @@ function ActiveCell(
   useEffect(() => {
     if (is_merged) {
       setIsMerging(true);
-      setTimeout(() => setIsMerging(false), 300);
+      setStyle(getPosition(coordinate, 1.1));
+      setTimeout(() => {
+        setIsMerging(false);
+        setStyle(getPosition(coordinate));
+      }, 200);
     }
   }, [is_merged]);
 

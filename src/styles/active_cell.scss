@@ -15,9 +15,11 @@ $cellSize: (500 - ($gap) * (4 - 1)) / 4;
   background: #eee4db;
   font-size: 40px;
   font-weight: bold;
+  transform: translate(0px, 0px) scale(0);
   transition: transform 0.2s ease-in-out, background 0.2s ease-in-out, opacity 0.1s ease-in-out;
   color: #776e65;
   content-visibility: visible;
+  contain: layout;
 
   &:not(.color-2, .color-4){
     color: #f8f5f0;

@@ -108,17 +108,20 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     let gainedScore = 0;
 
     for (let i = 0; i < movedCells.length; i++) {
-      if ( movedCells[i + 1] && movedCells[i].value === movedCells[i + 1].value ) {
-        const newValue = movedCells[i].value * 2;
+      const currentCell = movedCells[i];
+      const nextCell = movedCells[i + 1];
+
+      if (nextCell && currentCell.value === nextCell.value) {
+        const newValue = currentCell.value * 2;
         gainedScore += newValue;
         merged.push({
-          ...movedCells[i],
+          ...currentCell,
           value: newValue,
           is_merged: true,
         });
         i++;
       } else {
-        merged.push({ ...movedCells[i], is_merged: false });
+        merged.push({ ...currentCell, is_merged: false });
       }
     }
 
@@ -137,7 +140,7 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     };
   }
 
-  const moveCells = ( rows: Map<number, ActiveCellType[]>, direction: keyof typeof Direction, ) => {
+  const moveCells = ( rows: Map<number, ActiveCellType[]>, direction: keyof typeof Direction) => {
     const result: ActiveCellType[] = [];
 
     rows.forEach((cells) => {
