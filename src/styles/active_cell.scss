@@ -29,8 +29,6 @@ $cellSize: (500 - ($gap) * (4 - 1)) / 4;
   .cell-content {
     transform: scale(1);
     transition: transform 0.1s ease-in-out;
-    will-change: transform;
-    contain: layout style paint;
   }
 
   &.merging {
