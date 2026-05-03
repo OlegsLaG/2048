@@ -118,7 +118,7 @@
       <option name="presentableId" value="Default" />
       <updated>1774193642958</updated>
       <workItem from="1774193644015" duration="13073000" />
-      <workItem from="1777478476654" duration="22532000" />
+      <workItem from="1777478476654" duration="22616000" />
     </task>
     <task id="LOCAL-00001" summary="fix: remove unnecessary functions">
       <option name="closed" value="true" />
@@ -160,7 +160,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777806406361</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="fix: update">
+      <option name="closed" value="true" />
+      <created>1777808595647</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1777808595647</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
