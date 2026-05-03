@@ -12,6 +12,7 @@
   position: relative;
   width: fit-content;
   height: fit-content;
+  contain: layout style;
 }
 
 .active-grid {
@@ -19,7 +20,6 @@
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  @extend .grid-style;
 }
 
 .background-grid {

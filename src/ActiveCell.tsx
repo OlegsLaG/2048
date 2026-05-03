@@ -1,7 +1,7 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState, memo } from 'react';
 import type { ActiveCellType } from './utils/types.ts';
 
-function ActiveCell(
+const ActiveCell = memo(function ActiveCell(
   {
     id,
     value,
@@ -41,7 +41,7 @@ function ActiveCell(
     requestAnimationFrame(() => {
       setStyle(to);
     });
-  }, [coordinate.x, coordinate.y]);
+  }, [coordinate.x, coordinate.y, prev_coordinate, coordinate]);
 
   useEffect(() => {
     if (is_merged) {
@@ -52,7 +52,7 @@ function ActiveCell(
         setStyle(getPosition(coordinate));
       }, 200);
     }
-  }, [is_merged]);
+  }, [is_merged, coordinate]);
 
   return (
     <div id={id} className={`active-cell color-${value} ${isMerging ? 'merging' : ''}`} style={style}>
@@ -61,6 +61,6 @@ function ActiveCell(
       </div>
     </div>
   )
-}
+});
 
 export default ActiveCell;

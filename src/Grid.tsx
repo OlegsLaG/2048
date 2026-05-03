@@ -227,9 +227,10 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
       setActiveCell(moved);
       setTimeout(() => {
         setActiveCell(prev => {
-          activeCellRef.current = prev;
+          const afterMerge = prev.map(cell => !cell.is_merged ? cell : { ...cell, is_merged: false });
+          activeCellRef.current = afterMerge;
           const newCell = createNewActiveCell();
-          return newCell ? [...prev, newCell] : prev;
+          return newCell ? [...afterMerge, newCell] : afterMerge;
         });
         isAnimatingRef.current = false;
 
@@ -251,7 +252,6 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     }
 
     setActiveCell(newCells);
-
   };
 
   useLayoutEffect(() => {
@@ -299,7 +299,6 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     >
       <div
         className="active-grid"
-        style={gridStyles}
       >
         {activeCell?.map((cell) => (
           <ActiveCell
