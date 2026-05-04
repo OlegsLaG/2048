@@ -116,8 +116,14 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
         gainedScore += newValue;
         merged.push({
           ...currentCell,
+          is_merged: false,
+          hidden: true,
+        });
+        merged.push({
+          ...nextCell,
           value: newValue,
           is_merged: true,
+          hidden: false
         });
         i++;
       } else {
@@ -142,62 +148,33 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
 
   const moveCells = ( rows: Map<number, ActiveCellType[]>, direction: keyof typeof Direction) => {
     const result: ActiveCellType[] = [];
+    const isVertical = direction === 'ArrowUp' || direction === 'ArrowDown';
+    const isReversed = direction === 'ArrowDown' || direction === 'ArrowRight';
 
     rows.forEach((cells) => {
-      const sorted = [...cells].sort((start, end) => {
-        if (direction === 'ArrowUp') {
-          return start.coordinate.y - end.coordinate.y;
-        }
-
-        if (direction === 'ArrowDown') {
-          return end.coordinate.y - start.coordinate.y;
-        }
-
-        if (direction === 'ArrowLeft') {
-          return start.coordinate.x - end.coordinate.x;
-        }
-
-        if (direction === 'ArrowRight') {
-          return end.coordinate.x - start.coordinate.x;
-        }
-        return 0;
+      const sorted = [...cells]
+        .filter(cell => !cell.hidden)
+        .sort((start, end) => {
+        const startVal = isVertical ? start.coordinate.y : start.coordinate.x;
+        const endVal = isVertical ? end.coordinate.y : end.coordinate.x;
+        return isReversed ? endVal - startVal : startVal - endVal;
       });
 
-      const merged: ActiveCellType[] = mergeCells(sorted);
+      const merged = mergeCells(sorted);
+      let pos = isReversed ? size - 1 : 0;
+      const step = isReversed ? -1 : 1;
 
-      if (direction === 'ArrowDown') {
-        let y = size - 1;
-        merged.forEach((cell) => {
-          result.push(nextState(cell, cell.coordinate.x, y));
-          y--;
-        });
-      }
+      merged.forEach((cell) => {
+        const x = isVertical ? cell.coordinate.x : pos;
+        const y = isVertical ? pos : cell.coordinate.y;
+        result.push(nextState(cell, x, y));
 
-      if (direction === 'ArrowUp') {
-        let y = 0;
-        merged.forEach((cell) => {
-          result.push(nextState(cell, cell.coordinate.x, y));
-          y++;
-        });
-      }
+        if (!cell.hidden) {
+          pos += step;
+        }
+      });
 
-      if (direction === 'ArrowRight') {
-        let x = size - 1;
-        merged.forEach((cell) => {
-          result.push(nextState(cell, x, cell.coordinate.y));
-          x--;
-        });
-      }
-
-      if (direction === 'ArrowLeft') {
-        let x = 0;
-        merged.forEach((cell) => {
-          result.push(nextState(cell, x, cell.coordinate.y));
-          x++;
-        });
-      }
     });
-
     return result;
   };
 
@@ -210,7 +187,9 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
     const prevState = activeCellRef.current;
     const rows = new Map<number, ActiveCellType[]>();
 
-    prevState.forEach(cell => {
+    prevState
+      .filter(cell => !cell.hidden)
+      .forEach(cell => {
       const key = direction === 'ArrowUp' || direction === 'ArrowDown' ? cell.coordinate.x : cell.coordinate.y;
 
       if (!rows.has(key)) {
@@ -227,7 +206,10 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
       setActiveCell(moved);
       setTimeout(() => {
         setActiveCell(prev => {
-          const afterMerge = prev.map(cell => !cell.is_merged ? cell : { ...cell, is_merged: false });
+          const afterMerge = prev
+            .filter(cell => !cell.hidden)
+            .map(cell => !cell.is_merged ? cell : { ...cell, is_merged: false });
+
           activeCellRef.current = afterMerge;
           const newCell = createNewActiveCell();
           return newCell ? [...afterMerge, newCell] : afterMerge;
@@ -311,6 +293,7 @@ function Grid({ size, bus, onScore }: { size: number, bus: EventBus<Record<strin
             grid_gap={gap}
             value={cell.value}
             is_merged={cell.is_merged}
+            hidden={cell.hidden}
           />
         ))}
       </div>

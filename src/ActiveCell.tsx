@@ -9,16 +9,18 @@ const ActiveCell = memo(function ActiveCell(
     coordinate,
     grid_size,
     is_merged,
+    hidden,
   }: ActiveCellType
 ) {
   const gap = 15;
   const cellSize = (500 - (gap) * ((grid_size || 4) - 1)) / (grid_size || 4);
 
-  const getPosition = (coord: { x: number, y: number }, scale: number = 1) => ({
+  const getPosition = (coord: { x: number, y: number }, scale: number = 0) => ({
     transform: `translate(${coord.x * (cellSize + gap) + gap}px, ${coord.y * (cellSize + gap) + gap}px) scale(${scale})`
   });
 
   const [isMerging, setIsMerging] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
 
   const [style, setStyle] = useState(() =>
     getPosition(prev_coordinate || coordinate)
@@ -26,6 +28,9 @@ const ActiveCell = memo(function ActiveCell(
 
   useLayoutEffect(() => {
     if (!prev_coordinate) {
+      requestAnimationFrame(() => {
+        setStyle(getPosition(coordinate, 1));
+      })
       return;
     }
 
@@ -33,8 +38,8 @@ const ActiveCell = memo(function ActiveCell(
       return;
     }
 
-    const from = getPosition(prev_coordinate);
-    const to = getPosition(coordinate);
+    const from = getPosition(prev_coordinate, 1);
+    const to = getPosition(coordinate, 1);
 
     setStyle(from);
 
@@ -49,13 +54,23 @@ const ActiveCell = memo(function ActiveCell(
       setStyle(getPosition(coordinate, 1.1));
       setTimeout(() => {
         setIsMerging(false);
-        setStyle(getPosition(coordinate));
+        setStyle(getPosition(coordinate, 1));
       }, 200);
     }
-  }, [is_merged, coordinate]);
+    if (hidden) {
+      setIsHidden(true);
+    }
+  }, [is_merged, coordinate, hidden]);
 
   return (
-    <div id={id} className={`active-cell color-${value} ${isMerging ? 'merging' : ''}`} style={style}>
+    <div
+      id={id}
+      className={`active-cell color-${value} ${isMerging ? 'merging' : ''}`}
+      style={{
+        ...style,
+        opacity: isHidden ? 0 : 1,
+      }}
+    >
       <div className="cell-content">
         {value}
       </div>
