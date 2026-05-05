@@ -36,6 +36,11 @@ $cellSize: (500 - ($gap) * (4 - 1)) / 4;
       transform: rotateX(360deg) scale(0.3);
     }
   }
+
+  &.hidden {
+    opacity: 0;
+    transform: translate(0px, 0px) scale(0);
+  }
 }
 
 .color-4 {

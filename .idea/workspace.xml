@@ -7,8 +7,7 @@
     <list default="true" id="071badb1-5112-4292-9564-723ea9d0f247" name="Changes" comment="fix: update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ActiveCell.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/ActiveCell.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Grid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/Grid.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/styles/active_cell.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles/active_cell.scss" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +119,7 @@
       <option name="presentableId" value="Default" />
       <updated>1774193642958</updated>
       <workItem from="1774193644015" duration="13073000" />
-      <workItem from="1777478476654" duration="26822000" />
+      <workItem from="1777478476654" duration="27233000" />
     </task>
     <task id="LOCAL-00001" summary="fix: remove unnecessary functions">
       <option name="closed" value="true" />
@@ -178,7 +177,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777808681957</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="fix: update">
+      <option name="closed" value="true" />
+      <created>1777898562384</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1777898562384</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

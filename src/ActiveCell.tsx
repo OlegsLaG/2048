@@ -65,10 +65,9 @@ const ActiveCell = memo(function ActiveCell(
   return (
     <div
       id={id}
-      className={`active-cell color-${value} ${isMerging ? 'merging' : ''}`}
+      className={`active-cell color-${value} ${isMerging ? 'merging' : ''} ${isHidden ? 'hidden' : ''}`}
       style={{
         ...style,
-        opacity: isHidden ? 0 : 1,
       }}
     >
       <div className="cell-content">
