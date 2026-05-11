@@ -57,10 +57,13 @@ const ActiveCell = memo(function ActiveCell(
         setStyle(getPosition(coordinate, 1));
       }, 200);
     }
+  }, [is_merged, coordinate]);
+
+  useEffect(() => {
     if (hidden) {
       setIsHidden(true);
     }
-  }, [is_merged, coordinate, hidden]);
+  }, [hidden]);
 
   return (
     <div
