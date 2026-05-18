@@ -20,7 +20,6 @@ const ActiveCell = memo(function ActiveCell(
   });
 
   const [isMerging, setIsMerging] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
 
   const [style, setStyle] = useState(() =>
     getPosition(prev_coordinate || coordinate)
@@ -59,16 +58,10 @@ const ActiveCell = memo(function ActiveCell(
     }
   }, [is_merged, coordinate]);
 
-  useEffect(() => {
-    if (hidden) {
-      setIsHidden(true);
-    }
-  }, [hidden]);
-
   return (
     <div
       id={id}
-      className={`active-cell color-${value} ${isMerging ? 'merging' : ''} ${isHidden ? 'hidden' : ''}`}
+      className={`active-cell color-${value} ${isMerging ? 'merging' : ''} ${hidden ? 'hidden' : ''}`}
       style={{
         ...style,
       }}
