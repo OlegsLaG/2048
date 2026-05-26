@@ -17,7 +17,7 @@ const moveCells = (rows: Map<number, ActiveCellType[]>, direction: keyof typeof 
       });
 
     const { merged, gainedScore } = mergeCells(sorted);
-    score = gainedScore;
+    score += gainedScore;
 
     let pos = isReversed ? size - 1 : 0;
     const step = isReversed ? -1 : 1;

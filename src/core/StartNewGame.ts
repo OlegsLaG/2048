@@ -13,6 +13,7 @@ const startNewGame = (
   const newCells: ActiveCellType[] = [];
 
   for (let i = 0; i < startingCells; i++) {
+    console.warn('cellRefs', cellRefs);
     const cell = createNewActiveCell(
       grid,
       activeCellRef,
@@ -25,7 +26,6 @@ const startNewGame = (
       newCells.push(cell);
     }
   }
-
   return newCells;
 };
 

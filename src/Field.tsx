@@ -1,4 +1,4 @@
-import Grid from './Grid.tsx';
+import BackgroundGrid from './BackgroundGrid.tsx';
 import FieldHeader from './FieldHeader.tsx';
 import type { EventBus } from './engine/EventBus.ts';
 import { useState, useEffect } from 'react';
@@ -57,7 +57,7 @@ function Field({ size, bus }: { size: number, bus: EventBus<Record<string, unkno
   return (
     <div className="field">
       <FieldHeader size={size} score={score} bestScore={bestScore} />
-      <Grid size={size} bus={bus} onScore={(newScore) => setScore((prev: number) => prev + newScore)} />
+      <BackgroundGrid size={size} bus={bus} onScore={(newScore) => setScore((prev: number) => prev + newScore)} />
     </div>
   )
 }
