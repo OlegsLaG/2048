@@ -5,11 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="071badb1-5112-4292-9564-723ea9d0f247" name="Changes" comment="fix: update">
-      <change afterPath="$PROJECT_DIR$/src/ActiveGrid.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Field.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/Field.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Grid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/BackgroundGrid.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/MoveCells.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/MoveCells.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ActiveGrid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/ActiveGrid.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/StartNewGame.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/StartNewGame.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -124,7 +120,7 @@
       <workItem from="1774193644015" duration="13073000" />
       <workItem from="1777478476654" duration="28461000" />
       <workItem from="1778227379755" duration="18895000" />
-      <workItem from="1779120241585" duration="16188000" />
+      <workItem from="1779120241585" duration="16512000" />
     </task>
     <task id="LOCAL-00001" summary="fix: remove unnecessary functions">
       <option name="closed" value="true" />
@@ -214,7 +210,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779123556624</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="fix: update">
+      <option name="closed" value="true" />
+      <created>1779780749327</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1779780749327</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

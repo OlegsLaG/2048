@@ -35,7 +35,6 @@ function ActiveGrid(
   const startingCells = Math.round(size / 2);
 
   useLayoutEffect(() => {
-    console.warn(cellRefs.current)
     activeCellRef.current = [];
 
     if (hasRun.current) {
