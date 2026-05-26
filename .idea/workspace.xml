@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="071badb1-5112-4292-9564-723ea9d0f247" name="Changes" comment="fix: update">
-      <change beforePath="$PROJECT_DIR$/src/ActiveGrid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/ActiveGrid.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/StartNewGame.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/StartNewGame.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +120,7 @@
       <workItem from="1774193644015" duration="13073000" />
       <workItem from="1777478476654" duration="28461000" />
       <workItem from="1778227379755" duration="18895000" />
-      <workItem from="1779120241585" duration="16512000" />
+      <workItem from="1779120241585" duration="16890000" />
     </task>
     <task id="LOCAL-00001" summary="fix: remove unnecessary functions">
       <option name="closed" value="true" />
@@ -218,7 +218,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779780749327</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="fix: update">
+      <option name="closed" value="true" />
+      <created>1779780888165</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1779780888165</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
