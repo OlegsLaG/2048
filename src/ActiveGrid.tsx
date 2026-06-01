@@ -73,7 +73,9 @@ function ActiveGrid(
         size
       );
 
-      if (!newPosition) return;
+      if (!newPosition) {
+        return;
+      }
 
       onScore(newPosition.score);
 
@@ -89,7 +91,9 @@ function ActiveGrid(
   });
 
   useEffect(() => {
-    if (!isAnimatingRef.current) return;
+    if (!isAnimatingRef.current) {
+      return;
+    }
 
     const t = setTimeout(() => {
       setActiveCell(prev => {
@@ -113,7 +117,7 @@ function ActiveGrid(
       });
 
       isAnimatingRef.current = false;
-    }, 200); // совпадает с CSS transition
+    }, 200);
 
     return () => clearTimeout(t);
   }, [activeCell]);
