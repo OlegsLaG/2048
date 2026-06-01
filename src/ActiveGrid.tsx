@@ -77,6 +77,10 @@ function ActiveGrid(
         return;
       }
 
+      if (!newPosition.moved) {
+        return;
+      }
+
       onScore(newPosition.score);
 
       isAnimatingRef.current = true;
