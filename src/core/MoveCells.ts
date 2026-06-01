@@ -2,8 +2,8 @@ import { type ActiveCellType, Direction, type Matrix } from '../utils/types.ts';
 import mergeCells from './MergeCells.ts';
 
 function transpose(matrix: Matrix): Matrix {
-  return matrix[0].map((_, x) =>
-    matrix.map(row => row[x])
+  return matrix[0].map((_, index) =>
+    matrix.map(row => row[index])
   );
 }
 
@@ -24,7 +24,7 @@ const moveCells = (
     working = transpose(working);
   }
 
-  const processed: Matrix = working.map(row => {
+  const merged: Matrix = working.map(row => {
     let line = row.filter(Boolean) as ActiveCellType[];
 
     if (isReverse) {
@@ -48,7 +48,7 @@ const moveCells = (
     return filled;
   });
 
-  const finalMatrix = isVertical ? transpose(processed) : processed;
+  const finalMatrix = isVertical ? transpose(merged) : merged;
 
   const result: ActiveCellType[] = [];
 
