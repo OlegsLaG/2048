@@ -5,8 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="071badb1-5112-4292-9564-723ea9d0f247" name="Changes" comment="fix: update">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/core/CreateMatrix.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ActiveGrid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/ActiveGrid.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/MergeCells.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/MergeCells.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/MoveCells.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/MoveCells.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/SetNewPosition.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/SetNewPosition.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/types.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +125,9 @@
       <workItem from="1774193644015" duration="13073000" />
       <workItem from="1777478476654" duration="28461000" />
       <workItem from="1778227379755" duration="18895000" />
-      <workItem from="1779120241585" duration="16890000" />
+      <workItem from="1779120241585" duration="23230000" />
+      <workItem from="1779871448334" duration="20453000" />
+      <workItem from="1780130594068" duration="1925000" />
     </task>
     <task id="LOCAL-00001" summary="fix: remove unnecessary functions">
       <option name="closed" value="true" />
@@ -226,7 +233,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779780888165</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="fix: update">
+      <option name="closed" value="true" />
+      <created>1779781264577</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1779781264577</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

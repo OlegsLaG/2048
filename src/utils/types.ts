@@ -26,3 +26,5 @@ export const Direction = {
   ArrowDown: 'MOVE_DOWN',
   ArrowLeft: 'MOVE_LEFT',
 } as const;
+
+export type Matrix = (ActiveCellType | null)[][];

@@ -1,43 +1,81 @@
-import { type ActiveCellType, Direction } from '../utils/types.ts';
+import { type ActiveCellType, Direction, type Matrix } from '../utils/types.ts';
 import mergeCells from './MergeCells.ts';
 
-const moveCells = (rows: Map<number, ActiveCellType[]>, direction: keyof typeof Direction, size: number) => {
-  const result: ActiveCellType[] = [];
+function transpose(matrix: Matrix): Matrix {
+  return matrix[0].map((_, x) => matrix.map(row => row[x]));
+}
+
+const moveCells = (
+  matrix: Matrix,
+  direction: keyof typeof Direction,
+  size: number
+) => {
   let score = 0;
+
+  const isRight = direction === 'ArrowRight';
+  const isDown = direction === 'ArrowDown';
   const isVertical = direction === 'ArrowUp' || direction === 'ArrowDown';
-  const isReversed = direction === 'ArrowDown' || direction === 'ArrowRight';
 
-  rows.forEach((cells) => {
-    const sorted = [...cells]
-      .filter(cell => !cell.hidden)
-      .sort((start, end) => {
-        const startVal = isVertical ? start.coordinate.y : start.coordinate.x;
-        const endVal = isVertical ? end.coordinate.y : end.coordinate.x;
-        return isReversed ? endVal - startVal : startVal - endVal;
-      });
+  let working: Matrix = matrix.map(row => [...row]);
 
-    const { merged, gainedScore } = mergeCells(sorted);
+  if (isRight) {
+    working = working.map(row => [...row].reverse());
+  }
+
+  if (isVertical) {
+    working = transpose(working);
+
+    if (isDown) {
+      working = working.map(row => [...row].reverse());
+    }
+  }
+
+  let restored: Matrix = working.map(row => {
+    const cells = row.filter(Boolean) as ActiveCellType[];
+
+    const { merged, gainedScore } = mergeCells(cells);
     score += gainedScore;
 
-    let pos = isReversed ? size - 1 : 0;
-    const step = isReversed ? -1 : 1;
+    const filled: (ActiveCellType | null)[] = [
+      ...merged,
+      ...Array(size - merged.length).fill(null),
+    ];
 
-    merged.forEach((cell) => {
-      const x = isVertical ? cell.coordinate.x : pos;
-      const y = isVertical ? pos : cell.coordinate.y;
+    return filled;
+  });
+
+  if (isVertical) {
+    restored = transpose(restored);
+
+    if (isDown) {
+      restored = restored.map(row => row.reverse());
+    }
+  }
+
+  if (isRight) {
+    restored = restored.map(row => row.reverse());
+  }
+
+  const result: ActiveCellType[] = [];
+
+  restored.forEach((row, y) => {
+    row.forEach((cell, x) => {
+      if (!cell) {
+        return
+      }
+
       result.push({
         ...cell,
         prev_coordinate: cell.coordinate,
         coordinate: { x, y },
       });
-
-      if (!cell.hidden) {
-        pos += step;
-      }
     });
-
   });
-  return { result, score };
+
+  return {
+    result,
+    score,
+  };
 };
 
 export default moveCells;

@@ -58,39 +58,28 @@ function ActiveGrid(
   useEffect(() => {
     activeCellRef.current = activeCell;
     const handler = (event: KeyboardEvent) => {
-      const eventName = EventList[Direction[event.key as keyof typeof Direction]];
       const key = event.key as keyof typeof Direction;
 
-      if (eventName) {
-        const newPosition = setNewPosition(key, isAnimatingRef.current, activeCellRef.current, size);
-        if (newPosition) {
-          onScore(newPosition.score);
-          setActiveCell(newPosition.prevState);
+      const eventName = EventList[Direction[key]];
 
-          requestAnimationFrame(() => {
-            setActiveCell(newPosition.result);
-            setTimeout(() => {
-              setActiveCell(prev => {
-                const afterMerge = prev
-                  .filter((cell: ActiveCellType) => !cell.hidden)
-                  .map((cell: ActiveCellType) => !cell.is_merged ? cell : {...cell, is_merged: false});
-
-                activeCellRef.current = afterMerge;
-                const newCell = createNewActiveCell(
-                  grid,
-                  activeCellRef.current,
-                  cellRefs.current,
-                  size,
-                  bus,
-                );
-                return newCell ? [...afterMerge, newCell] : afterMerge;
-              });
-              isAnimatingRef.current = false;
-            }, 300);
-          })
-        }
-
+      if (!eventName) {
+        return;
       }
+
+      const newPosition = setNewPosition(
+        key,
+        isAnimatingRef.current,
+        activeCellRef.current,
+        size
+      );
+
+      if (!newPosition) return;
+
+      onScore(newPosition.score);
+
+      isAnimatingRef.current = true;
+
+      setActiveCell(newPosition.result);
     };
 
     window.addEventListener('keydown', handler);
@@ -98,6 +87,36 @@ function ActiveGrid(
       window.removeEventListener('keydown', handler);
     };
   });
+
+  useEffect(() => {
+    if (!isAnimatingRef.current) return;
+
+    const t = setTimeout(() => {
+      setActiveCell(prev => {
+        const afterMerge = prev
+          .filter(cell => !cell.hidden)
+          .map(cell =>
+            cell.is_merged ? { ...cell, is_merged: false } : cell
+          );
+
+        activeCellRef.current = afterMerge;
+
+        const newCell = createNewActiveCell(
+          grid,
+          activeCellRef.current,
+          cellRefs.current,
+          size,
+          bus,
+        );
+
+        return newCell ? [...afterMerge, newCell] : afterMerge;
+      });
+
+      isAnimatingRef.current = false;
+    }, 200); // совпадает с CSS transition
+
+    return () => clearTimeout(t);
+  }, [activeCell]);
 
   useEffect(() => {
     const handler = () => startNewGame();
@@ -115,7 +134,6 @@ function ActiveGrid(
     >
       {activeCell?.map((cell) => (
         <ActiveCell
-          style={cell?.style}
           key={cell.id}
           id={cell.id}
           prev_coordinate={cell.prev_coordinate}
