@@ -5,17 +5,16 @@ const mergeCells = (movedCells: ActiveCellType[]) => {
   let gainedScore = 0;
 
   for (let i = 0; i < movedCells.length; i++) {
-    const currentCell = movedCells[i];
-    const nextCell = movedCells[i + 1];
+    const current = movedCells[i];
+    const next = movedCells[i + 1];
 
-    if (nextCell && currentCell.value === nextCell.value) {
-      const value = currentCell.value * 2;
-
-      gainedScore += value;
+    if (next && current.value === next.value) {
+      const newValue = current.value * 2;
+      gainedScore += newValue;
 
       merged.push({
-        ...currentCell,
-        value,
+        ...current,
+        value: newValue,
         is_merged: true,
         hidden: false,
       });
@@ -23,7 +22,7 @@ const mergeCells = (movedCells: ActiveCellType[]) => {
       i++;
     } else {
       merged.push({
-        ...currentCell,
+        ...current,
         is_merged: false,
       });
     }
