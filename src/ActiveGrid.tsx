@@ -126,16 +126,6 @@ function ActiveGrid(
     return () => clearTimeout(t);
   }, [activeCell]);
 
-  useEffect(() => {
-    const handler = () => startNewGame();
-
-    bus.on(EventList.NEW_GAME, handler);
-
-    return () => {
-      bus.off(EventList.NEW_GAME, handler);
-    };
-  });
-
   return (
     <div
       className="active-grid"

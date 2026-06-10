@@ -1,8 +1,8 @@
-import { type RefObject } from 'react';
+import { type Ref } from 'react';
 
-function Cell({ id, ref }: { id: string, ref: RefObject<HTMLDivElement> }) {
+function Cell({ id, cellRef }: { id: string, cellRef?: Ref<HTMLDivElement>; }) {
   return (
-    <div id={id} className="cell" ref={ref}></div>
+    <div id={id} className="cell" ref={cellRef}></div>
   )
 }
 

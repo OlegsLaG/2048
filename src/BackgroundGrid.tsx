@@ -37,7 +37,7 @@ function BackgroundGrid({ size, bus, onScore }: { size: number, bus: EventBus<Re
           <Cell
             id={`${cell.coordinate.x}-${cell.coordinate.y}`}
             key={`${cell.coordinate.x}-${cell.coordinate.y}`}
-            ref={(el) => {
+            cellRef={(el: HTMLDivElement | null) => {
               const key = `${cell.coordinate.x}-${cell.coordinate.y}`;
               cellRefs.current[key] = el;
             }}
