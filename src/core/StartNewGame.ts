@@ -18,7 +18,6 @@ const startNewGame = (
       activeCellRef,
       cellRefs,
       size,
-      bus,
     );
 
     if (cell) {

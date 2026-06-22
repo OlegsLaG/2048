@@ -7,6 +7,8 @@ const hasAvailableMoves = (cells: ActiveCellType[], size: number) => {
     map.set(`${cell.coordinate.x}-${cell.coordinate.y}`, cell.value);
   });
 
+  console.warn('hasAvailableMoves', cells);
+
   for (let x = 0; x < size; x++) {
     for (let y = 0; y < size; y++) {
       const value = map.get(`${x}-${y}`);

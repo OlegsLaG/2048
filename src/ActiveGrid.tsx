@@ -6,6 +6,7 @@ import { EventList } from './engine/EventList.ts';
 import setNewPosition from './core/SetNewPosition.ts';
 import createNewActiveCell from './core/CreateNewActiveCell.ts';
 import { EventBus } from './engine/EventBus.ts';
+import checkGameOver from './core/CheckGameOver.ts';
 
 function ActiveGrid(
   {
@@ -78,6 +79,10 @@ function ActiveGrid(
       }
 
       if (!newPosition.moved) {
+        if (activeCellRef.current.length === size * size) {
+          checkGameOver(activeCellRef.current, size, bus);
+        }
+
         return;
       }
 
@@ -103,9 +108,7 @@ function ActiveGrid(
       setActiveCell(prev => {
         const afterMerge = prev
           .filter(cell => !cell.hidden)
-          .map(cell =>
-            cell.is_merged ? { ...cell, is_merged: false } : cell
-          );
+          .map(cell => cell.is_merged ? { ...cell, is_merged: false } : cell);
 
         activeCellRef.current = afterMerge;
 
@@ -114,10 +117,13 @@ function ActiveGrid(
           activeCellRef.current,
           cellRefs.current,
           size,
-          bus,
         );
 
-        return newCell ? [...afterMerge, newCell] : afterMerge;
+        const nextState = newCell ? [...afterMerge, newCell] : afterMerge;
+
+        activeCellRef.current = nextState;
+
+        return nextState;
       });
 
       isAnimatingRef.current = false;
