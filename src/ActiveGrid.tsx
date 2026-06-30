@@ -50,7 +50,6 @@ function ActiveGrid(
       activeCellRef.current,
       cellRefs.current,
       size,
-      bus,
     );
     setActiveCell(newCells);
     activeCellRef.current.push(...newCells);

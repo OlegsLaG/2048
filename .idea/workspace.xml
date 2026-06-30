@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="071badb1-5112-4292-9564-723ea9d0f247" name="Changes" comment="fix: update">
-      <change afterPath="$PROJECT_DIR$/src/core/CheckGameOver.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ActiveGrid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/ActiveGrid.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/CreateNewActiveCell.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/CreateNewActiveCell.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/HasAvailableMoves.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/HasAvailableMoves.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/StartNewGame.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/StartNewGame.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -130,7 +127,8 @@
       <workItem from="1780130594068" duration="20663000" />
       <workItem from="1780604938650" duration="18154000" />
       <workItem from="1781593039875" duration="596000" />
-      <workItem from="1781601141035" duration="5631000" />
+      <workItem from="1781601141035" duration="15658000" />
+      <workItem from="1782834601361" duration="1580000" />
     </task>
     <task id="LOCAL-00001" summary="fix: remove unnecessary functions">
       <option name="closed" value="true" />
@@ -308,7 +306,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781425152766</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="fix: update">
+      <option name="closed" value="true" />
+      <created>1782107667201</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1782107667201</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
